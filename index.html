@@ -1044,83 +1044,8 @@
 
             <!-- לשונית דשבורד סטטיסטי -->
             <section id="dashboard" class="tab-content">
-                <div class="dashboard-header">
-                    <h2>📈 דשבורד סטטיסטי</h2>
-                    <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
-                </div>
-
-                <!-- 4 כרטיסי KPI עליונים -->
-                <div class="dashboard-kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpiTotalGorillas" style="color: #64748b;">7</div>
-                        <div class="kpi-title">סה"כ גורילות</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpiHealthyGorillas" style="color: #22c55e;">0</div>
-                        <div class="kpi-title">✅ תקינות</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpiFaultyGorillas" style="color: #ef4444;">0</div>
-                        <div class="kpi-title">⚠️ לא תקינות</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                            <span id="kpiMonthTrainingDays" style="color: #0284c7;">0</span>
-                            <span style="color: #64748b; font-size: 0.8em;">/</span>
-                            <span id="kpiMonthCanceledDays" style="color: #ef4444;">0</span>
-                        </div>
-                        <div class="kpi-title">📅 ימי אימון חודשי <span style="color: #ef4444; font-size: 0.9em;">(ימים שבוטלו)</span></div>
-                    </div>
-                </div>
-
-                <!-- גריד מרכזי: נתוני פעילות חודשית + נתוני גורילות -->
-                <div class="dashboard-main-grid">
-                    <div class="dashboard-box">
-                        <div class="dashboard-box-title">
-                            <span>📊 נתוני גורילות (ימים מאז טיפול מול ימי אימון)</span>
-                            <span id="chartMonthLabel" style="font-size:0.8em; color:#0284c7;"></span>
-                        </div>
-                        <div style="position: relative; height: 280px; width: 100%;">
-                            <canvas id="gorillaBarChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-box">
-                        <div class="dashboard-box-title">
-                            <span>📋 סיכום פעילות - <span id="statsMonthTitle"></span></span>
-                        </div>
-                        <div class="stats-items-list">
-                            <div class="stat-item-row">
-                                <span class="stat-item-label">👥 סה"כ מתאמנים:</span>
-                                <span class="stat-item-value" id="dashTotalTrainees">0</span>
-                            </div>
-                            <div class="stat-item-row">
-                                <span class="stat-item-label">⏱️ סה"כ שעות פעילות (הערכה):</span>
-                                <span class="stat-item-value" id="dashTotalHours">0 שעות</span>
-                            </div>
-                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                                <span class="stat-item-label">📍 מיקומי אימון בחודש:</span>
-                                <div class="badges-wrap" id="dashLocationsList"></div>
-                            </div>
-                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                                <span class="stat-item-label">🛡️ כוחות מתאמנים (יחידות):</span>
-                                <div class="badges-wrap" id="dashUnitsList"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ריכוז תקלות פתוחות -->
-                <div class="faults-section">
-                    <div class="dashboard-box-title" style="border-bottom-color: rgba(239, 68, 68, 0.2); color: #ef4444;">
-                        <span>🔧 תקלות פתוחות כרגע</span>
-                        <span id="faultsCountBadge" style="font-size: 0.8em; background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px;">0 תקלות</span>
-                    </div>
-                    <div id="openFaultsContainer"></div>
-                </div>
-
-                <!-- סרגל חודשים בתחתית הדשבורד -->
-                <div class="month-folders-bar" id="dashboardMonthTabs"></div>
+                <h2>📈 דשבורד סטטיסטי</h2>
+                <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
             </section>
 
             <!-- לשונית משימות To-Do -->
@@ -1664,7 +1589,7 @@
                     <h4 style="margin: 12px 0 6px 0; font-size: 0.95em; color: var(--link-color);">⚙️ מעטפת שיגור, בטיחות ומעוף</h4>
                     <div class="table-container">
                         <table style="width: 100%; text-align: center; border-collapse: collapse; font-size: 0.82em;">
-                       <thead>
+                            <thead>
                                 <tr style="background-color: var(--th-bg); color: white;">
                                     <th style="padding: 8px;">נושא / פרמטר</th>
                                     <th style="padding: 8px;">נתון / פירוט</th>
@@ -1694,7 +1619,7 @@
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">TIPP OFF (יציאה מהזביל)</td>
                                     <td style="padding: 8px;">נפילה של 60 ס"מ ב-8 המטרים הראשונים</td>
-                                    </tr>
+                                </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">הצתת מנוע ראשי</td>
                                     <td style="padding: 8px;">ניצת רק לאחר 3.5 מטרים (להגנת המפעיל)</td>

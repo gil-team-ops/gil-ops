@@ -51,7 +51,7 @@
         window.knownTrainers = {
             "itayhaker19@gmail.com": { firstName: "איתי", lastName: "הקר", phone: "" },
             "adielkassa@gmail.com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209" },
-            "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "" },
+            "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231" },
             "nadavyichye@gmail.com": { firstName: "נדב", lastName: "יחיא", phone: "" },
             "idolevko2@gmail.com": { firstName: "עידו", lastName: "לבקוביץ", phone: "" },
             "tomerk2001@gmail.com": { firstName: "תומר", lastName: "כחלון", phone: "" },
@@ -89,6 +89,7 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then(() => {
                     localStorage.setItem('gorilla_last_email', email);
+                    sessionStorage.removeItem('gorilla_todo_modal_shown');
                 })
                 .catch((error) => {
                     if (btn) btn.disabled = false;
@@ -105,6 +106,7 @@
 
         window.logout = function() {
             localStorage.removeItem('gorilla_trainer_profile');
+            sessionStorage.removeItem('gorilla_todo_modal_shown');
             signOut(auth);
         };
 
@@ -179,17 +181,17 @@
         
         button, .btn, .link-table-btn, .tab-btn, .week-tab-btn, .month-folder-btn, 
         .wa-group-btn, .call-btn, .unit-wa-btn, .unit-add-btn, .theme-toggle-btn, 
-        .logout-btn, .trainer-save-btn, .cleaning-today-btn, .copy-btn, .yt-link-btn, .login-btn, .trainer-chip-btn, .todo-add-btn, .todo-edit-btn {
+        .logout-btn, .trainer-save-btn, .cleaning-today-btn, .copy-btn, .yt-link-btn, .login-btn, .trainer-chip-btn, .todo-add-btn, .todo-edit-btn, .trainer-badge-avatar, .remove-extra-row-btn, .header-user-avatar {
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
         }
         button:hover, .btn:hover, .link-table-btn:hover, .tab-btn:hover, .week-tab-btn:hover,
         .wa-group-btn:hover, .call-btn:hover, .unit-wa-btn:hover, .unit-add-btn:hover, 
         .theme-toggle-btn:hover, .logout-btn:hover, .trainer-save-btn:hover, 
-        .cleaning-today-btn:hover, .copy-btn:hover, .yt-link-btn:hover, .login-btn:hover, .trainer-chip-btn:hover, .todo-add-btn:hover, .todo-edit-btn:hover {
+        .cleaning-today-btn:hover, .copy-btn:hover, .yt-link-btn:hover, .login-btn:hover, .trainer-chip-btn:hover, .todo-add-btn:hover, .todo-edit-btn:hover, .trainer-badge-avatar:hover, .remove-extra-row-btn:hover, .header-user-avatar:hover {
             transform: translateY(-2.5px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
-        button:active, .btn:active, .link-table-btn:active, .tab-btn:active, .week-tab-btn:active {
+        button:active, .btn:active, .link-table-btn:active, .tab-btn:active, .week-tab-btn:active, .trainer-badge-avatar:active, .remove-extra-row-btn:active, .header-user-avatar:active {
             transform: translateY(0);
         }
 
@@ -278,8 +280,25 @@
 
         header { background-color: var(--header-bg); color: white; padding: 12px 8px; text-align: center; position: sticky; top: 0; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 8px auto; padding: 0 6px; }
-        header h1 { margin: 0; font-size: 1.15em; font-weight: 700; display: flex; align-items: center; gap: 12px; justify-content: center; color: white; }
+        header h1 { margin: 0; font-size: 1.15em; font-weight: 700; display: flex; align-items: center; gap: 10px; justify-content: center; color: white; }
         
+        .header-user-avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            background: #0284c7;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-weight: 800;
+            font-size: 0.95em;
+            cursor: pointer;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+
         .header-actions-left { display: flex; gap: 8px; align-items: center; }
         .theme-toggle-btn, .logout-btn { background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.78em; font-weight: bold; }
         .theme-toggle-btn:hover { background: #475569; }
@@ -585,6 +604,7 @@
             font-size: 0.78em;
             flex-shrink: 0;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
         }
         .todo-star-btn, .todo-edit-btn, .todo-delete-btn {
             background: none;
@@ -601,17 +621,38 @@
         .todo-delete-btn { color: #94a3b8; }
         .todo-delete-btn:hover { color: #ef4444; }
 
-        .trainer-profile-bar {
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;
-            padding: 12px 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        .remove-extra-row-btn {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #f87171;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.72em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            line-height: 1.2;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .trainer-info-text { font-size: 0.9em; font-weight: bold; }
-        .trainer-inputs-group { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .trainer-inputs-group input {
-            padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85em; background: var(--input-bg); color: var(--text-color);
+        .remove-extra-row-btn:hover {
+            background: #ef4444 !important;
+            color: white !important;
+            border-color: #dc2626 !important;
+            transform: scale(1.05);
         }
-        .trainer-save-btn { background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
-        .trainer-save-btn:hover { background: #0369a1; }
+        body.dark-mode .remove-extra-row-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: #ef4444;
+        }
+        body.dark-mode .remove-extra-row-btn:hover {
+            background: #ef4444 !important;
+            color: white !important;
+        }
 
         .schedule-header-action {
             display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; background: var(--card-bg);
@@ -692,13 +733,11 @@
         .spreadsheet-container table th:nth-child(10), .spreadsheet-container table td:nth-child(10) { width: 110px; min-width: 110px; } 
         .spreadsheet-container table th:nth-child(11), .spreadsheet-container table td:nth-child(11) { width: 90px; min-width: 90px; } 
         
-        /* צביעת שורה של היום - קונטרסט ברור לשדות וטקסט */
         .today-row td { background-color: #fef08a !important; border-color: #facc15 !important; color: #1e293b !important; font-weight: bold; }
         .today-row .cell-input, .today-row .cell-select { color: #1e293b !important; font-weight: bold; }
         body.dark-mode .today-row td { background-color: #713f12 !important; border-color: #fef08a !important; color: #fef08a !important; }
         body.dark-mode .today-row .cell-input, body.dark-mode .today-row .cell-select { color: #fef08a !important; }
 
-        /* צביעת שורה מבוטלת */
         .canceled-row td { background-color: rgba(239, 68, 68, 0.18) !important; border-color: #f87171 !important; color: #991b1b !important; }
         .canceled-row .cell-input, .canceled-row .cell-select { color: #991b1b !important; }
         body.dark-mode .canceled-row td { background-color: rgba(239, 68, 68, 0.3) !important; border-color: #991b1b !important; color: #fca5a5 !important; }
@@ -834,15 +873,8 @@
         <header>
             <div class="header-top">
                 <h1>
-                    <div style="display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; background:#f37021; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.3); vertical-align:middle; overflow:hidden;">
-                        <svg width="28" height="28" viewBox="0 0 100 100" style="transform: rotate(-45deg);">
-                            <rect x="35" y="20" width="30" height="60" rx="15" fill="#1e293b"/>
-                            <path d="M 35 35 Q 50 10 65 35 Z" fill="#334155"/>
-                            <circle cx="50" cy="28" r="4" fill="#38bdf8"/>
-                            <polygon points="20,55 35,50 35,70" fill="#0f172a"/>
-                            <polygon points="80,55 65,50 65,70" fill="#0f172a"/>
-                            <polygon points="45,80 55,80 52,90 48,90" fill="#f59e0b"/>
-                        </svg>
+                    <div id="userHeaderAvatar" class="header-user-avatar" onclick="editTrainerProfile()" title="לחץ לעריכת פרטי מדריך">
+                        גיל
                     </div>
                     תפעול והדרכה - צוות גיל
                 </h1>
@@ -871,11 +903,6 @@
         <main>
             <!-- לשונית סידור עבודה -->
             <section id="schedule" class="tab-content active">
-                <div class="trainer-profile-bar" id="trainerProfileBar">
-                    <div class="trainer-info-text" id="trainerInfoDisplay">👤 לא זוהית כמדריך. אנא הזן פרטים:</div>
-                    <div class="trainer-inputs-group" id="trainerInputsArea"></div>
-                </div>
-
                 <div class="schedule-header-action">
                     <h2 style="margin: 0; font-size: 1.15em;">📅 אימוני גורילות גיל - סידור עבודה חודשי ושבועי</h2>
                     <div class="search-box">
@@ -1670,6 +1697,21 @@
         </div>
     </div>
 
+    <!-- מודאל תזכורת משימות בכניסה למערכת -->
+    <div id="loginTodoReminderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:100000; align-items:center; justify-content:center; padding:20px;">
+        <div class="login-card" style="text-align:right; max-width:480px; width:100%; border:2px solid #0284c7; box-shadow:0 12px 30px rgba(0,0,0,0.6);">
+            <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:12px;">
+                <h3 style="margin:0; color:#38bdf8; font-size:1.15em; display:flex; align-items:center; gap:8px;">
+                    <span>🔔</span> משימות דחופות (היום ומחר)
+                </h3>
+                <button type="button" onclick="closeLoginTodoModal()" style="background:none; border:none; color:#94a3b8; font-size:1.2em; cursor:pointer;">✕</button>
+            </div>
+            <p id="loginTodoModalGreeting" style="font-size:0.9em; color:#cbd5e1; margin-bottom:12px; font-weight:600;"></p>
+            <div id="loginTodoModalList" style="display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; margin-bottom:15px; text-align:right;"></div>
+            <button type="button" class="login-btn" onclick="closeLoginTodoModal()">הבנתי, תודה 👍</button>
+        </div>
+    </div>
+
     <div id="datalistsContainer"></div>
 
     <script>
@@ -1696,6 +1738,16 @@
             hours: new Set(["08:00 - 13:00", "09:00 - 14:00", "12:00 - 17:00", "08:30 - 15:30"]),
             notes: new Set(["אימון שגרתי תקין", "בוצע שיגור מוצלח", "תדרוך קצינים", "נדרש רענון למשגר", "טיפול חודשי"])
         };
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
         function getLocalDateString(d = new Date()) {
             const year = d.getFullYear();
@@ -1727,9 +1779,9 @@
             };
         }
 
-        const debouncedFilterSchedule = debounce(filterSchedule, 100);
-        const debouncedFilterSlides = debounce(filterSlides, 100);
-        const debouncedFilterForms = debounce(filterFormsTab, 100);
+        window.debouncedFilterSchedule = debounce(filterSchedule, 100);
+        window.debouncedFilterSlides = debounce(filterSlides, 100);
+        window.debouncedFilterForms = debounce(filterFormsTab, 100);
 
         function normalizeRowValues(val) {
             if (Array.isArray(val)) {
@@ -2053,14 +2105,20 @@
                 const monthData = getMonthDataCache(dayInfo.month);
                 const isToday = (currentYear === today.getFullYear() && dayInfo.month === today.getMonth() && dayInfo.day === today.getDate());
 
-                const northRows = monthData.north.filter(item => item.dayNum === dayInfo.day);
-                const southRows = monthData.south.filter(item => item.dayNum === dayInfo.day);
+                let northRows = monthData.north.filter(item => item.dayNum === dayInfo.day);
+                let southRows = monthData.south.filter(item => item.dayNum === dayInfo.day);
 
                 if (northRows.length === 0) {
-                    northRows.push({ dayNum: dayInfo.day, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] });
+                    const defObj = { dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] };
+                    monthData.north.push(defObj);
+                    monthData.north.sort((a, b) => a.dayNum - b.dayNum);
+                    northRows = [defObj];
                 }
                 if (southRows.length === 0) {
-                    southRows.push({ dayNum: dayInfo.day, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] });
+                    const defObj = { dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] };
+                    monthData.south.push(defObj);
+                    monthData.south.sort((a, b) => a.dayNum - b.dayNum);
+                    southRows = [defObj];
                 }
 
                 northRows.forEach((nData, index) => {
@@ -2108,12 +2166,14 @@
             filterSchedule();
         }
 
+        // ================= ניהול משימות To-Do והודעות לוואטסאפ =================
         function initCloudTodoSync() {
             const todoRef = window.fbRef(window.fbDB, 'todos');
             window.fbOnValue(todoRef, (snapshot) => {
                 latestTodosData = snapshot.val() || {};
                 renderTodoList();
                 checkUserTodoReminders();
+                checkLoginTodoPopup();
             });
         }
 
@@ -2132,6 +2192,46 @@
             for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
             return colors[Math.abs(hash) % colors.length];
         }
+
+        function getTrainerPhoneByName(name) {
+            if (!name) return "";
+            const cleanTarget = name.trim();
+            for (let email in window.knownTrainers) {
+                const t = window.knownTrainers[email];
+                const fullName = `${t.firstName} ${t.lastName}`.trim();
+                if (fullName === cleanTarget || t.firstName === cleanTarget) {
+                    return t.phone || "";
+                }
+            }
+            const currentTrainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
+            if (currentTrainer && currentTrainer.phone) {
+                const currentFullName = `${currentTrainer.firstName} ${currentTrainer.lastName}`.trim();
+                if (currentFullName === cleanTarget || currentTrainer.firstName === cleanTarget) {
+                    return currentTrainer.phone;
+                }
+            }
+            return "";
+        }
+
+        window.sendTodoWhatsApp = function(todoId) {
+            const task = latestTodosData[todoId];
+            if (!task) return;
+
+            const assignee = task.assignee || "מדריך";
+            const title = task.title || "";
+            let phone = getTrainerPhoneByName(assignee);
+
+            const msg = `היי ${assignee} נוצרה לך משימה חדשה והיא:\n${title}`;
+
+            let waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            if (phone) {
+                let cleanPhone = phone.replace(/\D/g, '');
+                if (cleanPhone.startsWith('0')) cleanPhone = '972' + cleanPhone.substring(1);
+                waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+            }
+
+            window.open(waUrl, '_blank');
+        };
 
         function formatTodoDate(dateStr) {
             if (!dateStr) return "";
@@ -2192,7 +2292,71 @@
             }
         }
 
-        function handleCreateTodo(e) {
+        function checkLoginTodoPopup() {
+            if (sessionStorage.getItem('gorilla_todo_modal_shown')) return;
+
+            const trainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
+            if (!trainer || !trainer.firstName) return;
+
+            const todayStr = getLocalDateString(new Date());
+            const tomorrowObj = new Date();
+            tomorrowObj.setDate(tomorrowObj.getDate() + 1);
+            const tomorrowStr = getLocalDateString(tomorrowObj);
+
+            const tasks = Object.keys(latestTodosData).map(k => ({ id: k, ...latestTodosData[k] }));
+            
+            const urgentTasks = tasks.filter(t => {
+                if (t.completed) return false;
+                const isAssignedToMe = t.assignee && (t.assignee.includes(trainer.firstName) || (trainer.lastName && t.assignee.includes(trainer.lastName)));
+                if (!isAssignedToMe) return false;
+                return t.dueDate === todayStr || t.dueDate === tomorrowStr || (t.dueDate && t.dueDate < todayStr);
+            });
+
+            if (urgentTasks.length > 0) {
+                showLoginTodoModal(trainer, urgentTasks, todayStr, tomorrowStr);
+                sessionStorage.setItem('gorilla_todo_modal_shown', 'true');
+            }
+        }
+
+        function showLoginTodoModal(trainer, urgentTasks, todayStr, tomorrowStr) {
+            const modal = document.getElementById('loginTodoReminderModal');
+            const greeting = document.getElementById('loginTodoModalGreeting');
+            const listEl = document.getElementById('loginTodoModalList');
+            if (!modal || !greeting || !listEl) return;
+
+            greeting.innerText = `שלום ${trainer.firstName}, להלן פירוט המשימות הדחופות שלך להיום ולמחר:`;
+            listEl.innerHTML = '';
+
+            urgentTasks.forEach(task => {
+                let badgeHTML = '';
+                const formattedDate = formatTodoDate(task.dueDate);
+
+                if (task.dueDate < todayStr) {
+                    badgeHTML = `<span style="background:#ef4444; color:white; padding:2px 6px; border-radius:10px; font-size:0.75em; font-weight:bold;">באיחור (${formattedDate})</span>`;
+                } else if (task.dueDate === todayStr) {
+                    badgeHTML = `<span style="background:#f59e0b; color:white; padding:2px 6px; border-radius:10px; font-size:0.75em; font-weight:bold;">היום ⏰</span>`;
+                } else if (task.dueDate === tomorrowStr) {
+                    badgeHTML = `<span style="background:#0284c7; color:white; padding:2px 6px; border-radius:10px; font-size:0.75em; font-weight:bold;">מחר ⏳ (${formattedDate})</span>`;
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.style.cssText = "background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px;";
+                itemDiv.innerHTML = `
+                    <span style="color:#f8fafc; font-size:0.9em; font-weight:600;">• ${escapeHtml(task.title)}</span>
+                    ${badgeHTML}
+                `;
+                listEl.appendChild(itemDiv);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        window.closeLoginTodoModal = function() {
+            const modal = document.getElementById('loginTodoReminderModal');
+            if (modal) modal.style.display = 'none';
+        };
+
+        window.handleCreateTodo = function(e) {
             if (e) e.preventDefault();
             const titleInput = document.getElementById('todoTitleInput');
             const assigneeSelect = document.getElementById('todoAssigneeSelect');
@@ -2220,7 +2384,7 @@
                 if (titleInput) titleInput.value = "";
                 if (dateInput) dateInput.value = "";
             }).catch(console.error);
-        }
+        };
 
         window.toggleTodoCompleted = function(id, currentStatus) {
             const updates = {};
@@ -2331,8 +2495,8 @@
             const avatarBg = task.assignee ? getTrainerColor(task.assignee) : "#64748b";
 
             const assigneeBadge = task.assignee ? `
-                <div class="trainer-badge-avatar" style="background-color: ${avatarBg};" title="אחראי: ${task.assignee}">
-                    ${initials}
+                <div class="trainer-badge-avatar" style="background-color: ${avatarBg};" title="לחץ לשליחת הודעה בוואטסאפ ל-${escapeHtml(task.assignee)}" onclick="sendTodoWhatsApp('${task.id}')">
+                    ${escapeHtml(initials)}
                 </div>
             ` : '';
 
@@ -2361,7 +2525,7 @@
                         ${task.completed ? '✓' : ''}
                     </button>
                     <div class="todo-item-info">
-                        <div class="todo-item-title">${task.title}</div>
+                        <div class="todo-item-title">${escapeHtml(task.title)}</div>
                         ${dateBadge}
                     </div>
                 </div>
@@ -2428,8 +2592,8 @@
                 } else {
                     faultsContainer.innerHTML = faultsList.map(f => `
                         <div class="fault-row-item">
-                            <span>${f.notes}</span>
-                            <span style="font-weight: 800;">${f.gorillaName}</span>
+                            <span>${escapeHtml(f.notes)}</span>
+                            <span style="font-weight: 800;">${escapeHtml(f.gorillaName)}</span>
                         </div>
                     `).join('');
                 }
@@ -2506,14 +2670,14 @@
             const locList = document.getElementById('dashLocationsList');
             if (locList) {
                 locList.innerHTML = uniqueLocations.size > 0 
-                    ? Array.from(uniqueLocations).map(l => `<span class="info-tag">${l}</span>`).join('') 
+                    ? Array.from(uniqueLocations).map(l => `<span class="info-tag">${escapeHtml(l)}</span>`).join('') 
                     : '<span style="color:#64748b; font-size:0.85em;">אין מיקומים רשומים</span>';
             }
 
             const unitsList = document.getElementById('dashUnitsList');
             if (unitsList) {
                 unitsList.innerHTML = uniqueUnits.size > 0 
-                    ? Array.from(uniqueUnits).map(u => `<span class="info-tag">${u}</span>`).join('') 
+                    ? Array.from(uniqueUnits).map(u => `<span class="info-tag">${escapeHtml(u)}</span>`).join('') 
                     : '<span style="color:#64748b; font-size:0.85em;">אין יחידות רשומות</span>';
             }
 
@@ -2599,7 +2763,7 @@
             });
         }
 
-        function addExtraRow(side) {
+        window.addExtraRow = function(side) {
             if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
             const currentWeekObj = monthWeeksCache[activeWeekIndex];
 
@@ -2667,22 +2831,28 @@
             saveSideArrayToCloud(side, targetMonthIdx);
             renderCurrentWeekTables();
             renderDashboard(activeDashboardMonth);
-        }
+        };
 
-        function removeExtraRow(side, monthIdx, cacheIndex) {
-            if (!confirm("האם אתה בטוח שברצונך למחוק שורה זו?")) return;
-            const monthData = getMonthDataCache(monthIdx);
-            if (side === 'north') {
-                monthData.north.splice(cacheIndex, 1);
-            } else {
-                monthData.south.splice(cacheIndex, 1);
+        window.removeExtraRow = function(side, monthIdx, cacheIndex, event) {
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
             }
+            if (!confirm("האם אתה בטוח שברצונך למחוק שורה נוספת זו?")) return;
+            
+            const monthData = getMonthDataCache(monthIdx);
+            if (!monthData || !monthData[side] || cacheIndex < 0 || cacheIndex >= monthData[side].length) {
+                console.error("Invalid index for deletion", cacheIndex);
+                return;
+            }
+
+            monthData[side].splice(cacheIndex, 1);
             saveSideArrayToCloud(side, monthIdx);
             renderCurrentWeekTables();
             renderDashboard(activeDashboardMonth);
-        }
+        };
 
-        function showSecondGuideSelect(side, monthIdx, cacheIndex) {
+        window.showSecondGuideSelect = function(side, monthIdx, cacheIndex) {
             const monthData = getMonthDataCache(monthIdx);
             const rowData = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
             if (rowData) {
@@ -2692,14 +2862,14 @@
                 }
             }
             renderCurrentWeekTables();
-        }
+        };
 
-        function removeSecondGuideSelect(side, monthIdx, cacheIndex) {
+        window.removeSecondGuideSelect = function(side, monthIdx, cacheIndex) {
             updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
             renderCurrentWeekTables();
-        }
+        };
 
-        function showSecondGorillaSelect(side, monthIdx, cacheIndex) {
+        window.showSecondGorillaSelect = function(side, monthIdx, cacheIndex) {
             const monthData = getMonthDataCache(monthIdx);
             const rowData = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
             if (rowData) {
@@ -2709,12 +2879,12 @@
                 }
             }
             renderCurrentWeekTables();
-        }
+        };
 
-        function removeSecondGorillaSelect(side, monthIdx, cacheIndex) {
+        window.removeSecondGorillaSelect = function(side, monthIdx, cacheIndex) {
             updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
             renderCurrentWeekTables();
-        }
+        };
 
         window.handleGuideSelection = function(side, monthIdx, cacheIndex, fieldIndex, selectEl) {
             let val = selectEl.value;
@@ -2773,7 +2943,7 @@
         function buildRowHTML(dayNum, hDayName, vals, side, monthIdx, cacheIndex, isExtra) {
             const dateStr = `${String(dayNum).padStart(2, '0')}.${String(monthIdx + 1).padStart(2, '0')}`;
             const currentVal = vals[0] || `${dateStr} ${hDayName}`;
-            const extraBadge = isExtra ? `<div style="font-size:0.7em; color:#e74c3c; font-weight:600; margin-top:1px; cursor:pointer;" onclick="removeExtraRow('${side}', ${monthIdx}, ${cacheIndex})" title="לחץ למחיקת השורה">❌ (נוסף)</div>` : '';
+            const extraBadge = isExtra ? `<button type="button" class="remove-extra-row-btn" onclick="window.removeExtraRow('${side}', ${monthIdx}, ${cacheIndex}, event)" title="מחק שורה נוספת זו">❌ מחק שורה</button>` : '';
 
             const guide1Val = vals[1] || '';
             const guide2Val = vals[10] || '';
@@ -2839,23 +3009,23 @@
 
             return `
                 <td>
-                    <input id="cell_${side}_${monthIdx}_${cacheIndex}_0" type="text" class="cell-input" value="${currentVal}" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 0, this.value)">
+                    <input id="cell_${side}_${monthIdx}_${cacheIndex}_0" type="text" class="cell-input" value="${escapeHtml(currentVal)}" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 0, this.value)">
                     ${extraBadge}
                 </td>
                 ${guideCellHTML}
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_2" type="text" class="cell-input" value="${vals[2] || ''}" placeholder="כוח מתאמן" list="mem-units" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 2, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_3" type="text" class="cell-input" value="${vals[3] || ''}" placeholder="מיקום" list="mem-locations" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 3, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_2" type="text" class="cell-input" value="${escapeHtml(vals[2] || '')}" placeholder="כוח מתאמן" list="mem-units" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 2, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_3" type="text" class="cell-input" value="${escapeHtml(vals[3] || '')}" placeholder="מיקום" list="mem-locations" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 3, this.value)"></td>
                 <td>
                     <select id="cell_${side}_${monthIdx}_${cacheIndex}_4" class="cell-select ${vals[4] ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 4, this.value)">
                         ${systemsOptions.map(s => `<option value="${s}" ${vals[4] === s ? 'selected' : ''}>${s}</option>`).join('')}
                     </select>
                 </td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_5" type="text" class="cell-input" value="${vals[5] || ''}" placeholder="איש קשר" list="mem-contacts" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 5, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_6" type="text" class="cell-input" value="${vals[6] || ''}" placeholder="מס'" list="mem-count" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 6, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_5" type="text" class="cell-input" value="${escapeHtml(vals[5] || '')}" placeholder="איש קשר" list="mem-contacts" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 5, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_6" type="text" class="cell-input" value="${escapeHtml(vals[6] || '')}" placeholder="מס'" list="mem-count" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 6, this.value)"></td>
                 ${gorillaCellHTML}
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_8" type="text" class="cell-input" value="${vals[8] || ''}" placeholder="שעות" list="mem-hours" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 8, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_9" type="text" class="cell-input" value="${vals[9] || ''}" placeholder="הערות" list="mem-notes" onchange="handleNotesChange('${side}', ${monthIdx}, ${cacheIndex}, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_12" type="text" class="cell-input" value="${vals[12] || ''}" placeholder="ניידת" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 12, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_8" type="text" class="cell-input" value="${escapeHtml(vals[8] || '')}" placeholder="שעות" list="mem-hours" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 8, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_9" type="text" class="cell-input" value="${escapeHtml(vals[9] || '')}" placeholder="הערות" list="mem-notes" onchange="handleNotesChange('${side}', ${monthIdx}, ${cacheIndex}, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_12" type="text" class="cell-input" value="${escapeHtml(vals[12] || '')}" placeholder="ניידת" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 12, this.value)"></td>
             `;
         }
 
@@ -2864,7 +3034,7 @@
             else selectEl.classList.remove('has-selection');
         }
 
-        function handleNotesChange(side, monthIdx, cacheIndex, value) {
+        window.handleNotesChange = function(side, monthIdx, cacheIndex, value) {
             updateCacheAndSave(side, monthIdx, cacheIndex, 9, value);
             
             if (value && value.trim().includes("טיפול חודשי")) {
@@ -2873,9 +3043,9 @@
             
             renderCurrentWeekTables();
             renderDashboard(activeDashboardMonth);
-        }
+        };
 
-        function updateCacheAndSave(side, monthIdx, cacheIndex, fieldIndex, value) {
+        window.updateCacheAndSave = function(side, monthIdx, cacheIndex, fieldIndex, value) {
             const monthData = getMonthDataCache(monthIdx);
             const targetRow = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
 
@@ -2904,7 +3074,7 @@
                 rebuildDatalists();
                 renderDashboard(activeDashboardMonth);
             }
-        }
+        };
 
         function saveSideArrayToCloud(side, monthIdx) {
             const monthData = getMonthDataCache(monthIdx);
@@ -2965,7 +3135,7 @@
             });
         }
 
-        function saveStatusData() {
+        window.saveStatusData = function() {
             const rows = document.querySelectorAll('#statusTableBody tr');
             let statusesData = {};
             rows.forEach((row, index) => {
@@ -2982,23 +3152,23 @@
             const statusRef = window.fbRef(window.fbDB, 'gorilla_statuses');
             window.fbSet(statusRef, statusesData);
             renderDashboard(activeDashboardMonth);
-        }
+        };
 
-        function openCleaningPicker(btn) {
+        window.openCleaningPicker = function(btn) {
             const row = btn.closest('tr');
             const input = row.querySelector('.cleaning-date-input');
             if (input) {
                 if (typeof input.showPicker === 'function') input.showPicker();
                 else input.click();
             }
-        }
+        };
 
-        function onCleaningDateChange(input) {
+        window.onCleaningDateChange = function(input) {
             const row = input.closest('tr');
             const btn = row.querySelector('.cleaning-today-btn');
             if (input.value) updateCleaningButtonText(btn, input.value);
-            saveStatusData();
-        }
+            window.saveStatusData();
+        };
 
         function updateCleaningButtonText(btn, dateStr) {
             if (!dateStr || !btn) return;
@@ -3029,55 +3199,50 @@
                 localStorage.setItem('gorilla_trainer_profile', JSON.stringify(trainer));
             }
 
-            const display = document.getElementById('trainerInfoDisplay');
-            const inputsArea = document.getElementById('trainerInputsArea');
-            if (!display || !inputsArea) return;
-
-            if (trainer) {
-                display.innerHTML = `👤 מחובר כ: <strong>${trainer.firstName} ${trainer.lastName}</strong> (${trainer.email}${trainer.phone ? ' | ' + trainer.phone : ''}) <button onclick="editTrainerProfile()" style="background:none; border:none; color:#0284c7; cursor:pointer; font-size:0.85em; text-decoration:underline; margin-right:8px;">[שנה פרטים]</button>`;
-                inputsArea.style.display = 'none';
-            } else {
-                display.innerHTML = `👤 התחברות מדריך:`;
-                inputsArea.innerHTML = `
-                    <input type="text" id="tFirstName" placeholder="שם פרטי">
-                    <input type="text" id="tLastName" placeholder="שם משפחה">
-                    <input type="email" id="tEmail" placeholder="כתובת מייל">
-                    <input type="tel" id="tPhone" placeholder="מספר טלפון">
-                    <button class="trainer-save-btn" onclick="saveTrainerProfile()">שמור פרופיל 💾</button>
-                `;
-                inputsArea.style.display = 'flex';
+            const headerAvatar = document.getElementById('userHeaderAvatar');
+            if (headerAvatar) {
+                if (trainer && trainer.firstName) {
+                    const initials = getTrainerInitials(trainer.firstName + ' ' + (trainer.lastName || ''));
+                    headerAvatar.innerText = initials;
+                    headerAvatar.style.backgroundColor = getTrainerColor(trainer.firstName);
+                    headerAvatar.title = `מחובר כ: ${trainer.firstName} ${trainer.lastName || ''} | לחץ לעריכה`;
+                } else {
+                    headerAvatar.innerText = "👤";
+                    headerAvatar.style.backgroundColor = "#f37021";
+                    headerAvatar.title = "לחץ להגדרת פרטי מדריך";
+                }
             }
 
             checkUserTodoReminders();
         };
 
-        function saveTrainerProfile() {
-            const fName = document.getElementById('tFirstName')?.value.trim();
-            const lName = document.getElementById('tLastName')?.value.trim();
-            const email = document.getElementById('tEmail')?.value.trim();
-            const phone = document.getElementById('tPhone')?.value.trim();
-
-            if (!fName || !lName || !email || !phone) {
-                alert('אנא מלא שם פרטי, שם משפחה, כתובת מייל ומספר טלפון.');
+        window.editTrainerProfile = function() {
+            let trainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null') || {};
+            const fName = prompt("שם פרטי:", trainer.firstName || "");
+            if (fName === null) return;
+            const lName = prompt("שם משפחה:", trainer.lastName || "");
+            if (lName === null) return;
+            const phone = prompt("מספר טלפון:", trainer.phone || "");
+            if (phone === null) return;
+            
+            if (!fName.trim()) {
+                alert("נא להזין שם פרטי לפחות.");
                 return;
             }
 
-            const profile = { firstName: fName, lastName: lName, email: email, phone: phone };
-            localStorage.setItem('gorilla_trainer_profile', JSON.stringify(profile));
+            trainer.firstName = fName.trim();
+            trainer.lastName = lName.trim();
+            trainer.phone = phone.trim();
+            
+            localStorage.setItem('gorilla_trainer_profile', JSON.stringify(trainer));
             window.initTrainerProfile();
-            alert('הפרטים נשמרו בהצלחה!');
-        }
+            alert("הפרטים עודכנו בהצלחה! ✓");
+        };
 
-        function editTrainerProfile() {
-            localStorage.removeItem('gorilla_trainer_profile');
-            window.initTrainerProfile();
-        }
-
-        function exportWeeklyShiftsToCalendar() {
+        window.exportWeeklyShiftsToCalendar = function() {
             const trainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
             if (!trainer) {
-                alert('אנא הזן את פרטי המדריך שלך בראש העמוד לפני שליחת המשמרות.');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                alert('אנא הגדר את פרטי המדריך שלך (לחיצה על האוואטר בראש העמוד) לפני שליחת המשמרות.');
                 return;
             }
 
@@ -3125,9 +3290,9 @@
             }
 
             window.open(waUrl, '_blank');
-        }
+        };
 
-        function sendTomorrowReminder(side) {
+        window.sendTomorrowReminder = function(side) {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             const mIdx = tomorrow.getMonth();
@@ -3169,8 +3334,11 @@
 
             selectedRows.forEach(rowObj => {
                 const r = rowObj.values;
-                if (r[5] && /\d{9,}/.test(r[5])) {
-                    targetPhone = r[5];
+                if (r[5]) {
+                    const digits = r[5].replace(/\D/g, '');
+                    if (digits.length >= 9) {
+                        targetPhone = digits;
+                    }
                 }
             });
 
@@ -3184,9 +3352,9 @@
             }
 
             window.open(waUrl, '_blank');
-        }
+        };
 
-        function updateRowStatus(selectElement) {
+        window.updateRowStatus = function(selectElement) {
             const row = selectElement.closest('tr');
             const notesInput = row.querySelector('.notes-input');
             if (selectElement.value === 'לא תקין') {
@@ -3196,19 +3364,19 @@
                     notesInput.value = currentVal ? currentVal + " | " + faultNotes.trim() : faultNotes.trim();
                 }
             }
-            saveStatusData();
-        }
+            window.saveStatusData();
+        };
 
-        function toggleTheme() {
+        window.toggleTheme = function() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('gorilla_theme', isDark ? 'dark' : 'light');
             const tBtn = document.getElementById('themeToggleBtn');
             if (tBtn) tBtn.innerText = isDark ? '☀️ מצב בהיר' : '🌙 מצב כהה';
             renderDashboard(activeDashboardMonth);
-        }
+        };
 
-        function switchTab(tabId, event, save = true) {
+        window.switchTab = function(tabId, event, save = true) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             const targetTab = document.getElementById(tabId);
@@ -3225,7 +3393,7 @@
             }
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        };
 
         function filterSchedule() {
             const searchEl = document.getElementById("scheduleSearch");
@@ -3289,7 +3457,7 @@
             });
         }
 
-        function sendGroupWhatsAppSummary() {
+        window.sendGroupWhatsAppSummary = function() {
             if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
             const currentWeekObj = monthWeeksCache[activeWeekIndex];
             let msg = `📋 *סיכום שבועי לקבוצה - שבוע ${currentWeekObj.weekNum}*\n\n`;
@@ -3327,9 +3495,9 @@
 
             if (count === 0) { alert(`לא נמצאו נתונים פעילים בשבוע ${currentWeekObj.weekNum}.`); return; }
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-        }
+        };
 
-        function copyText(text, btnElement) {
+        window.copyText = function(text, btnElement) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
                     showCopiedFeedback(btnElement);
@@ -3339,7 +3507,7 @@
             } else {
                 fallbackCopyText(text, btnElement);
             }
-        }
+        };
 
         function fallbackCopyText(text, btnElement) {
             const textArea = document.createElement("textarea");

@@ -1664,7 +1664,7 @@
                     <h4 style="margin: 12px 0 6px 0; font-size: 0.95em; color: var(--link-color);">⚙️ מעטפת שיגור, בטיחות ומעוף</h4>
                     <div class="table-container">
                         <table style="width: 100%; text-align: center; border-collapse: collapse; font-size: 0.82em;">
-                            <thead>
+                       <thead>
                                 <tr style="background-color: var(--th-bg); color: white;">
                                     <th style="padding: 8px;">נושא / פרמטר</th>
                                     <th style="padding: 8px;">נתון / פירוט</th>
@@ -1694,7 +1694,7 @@
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">TIPP OFF (יציאה מהזביל)</td>
                                     <td style="padding: 8px;">נפילה של 60 ס"מ ב-8 המטרים הראשונים</td>
-                                </tr>
+                                    </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">הצתת מנוע ראשי</td>
                                     <td style="padding: 8px;">ניצת רק לאחר 3.5 מטרים (להגנת המפעיל)</td>
@@ -3136,7 +3136,10 @@
             }));
 
             const sideRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}/${side}`);
-            window.fbSet(sideRef, cleanArray).catch(console.error);
+            window.fbSet(sideRef, cleanArray).then(() => {
+                renderCurrentWeekTables();
+                renderDashboard(activeDashboardMonth);
+            }).catch(console.error);
         }
 
         function initCloudStatusSync() {

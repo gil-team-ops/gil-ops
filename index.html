@@ -1903,6 +1903,53 @@
             window.fbOnValue(sheetRef, callback);
         }
 
+        function loadMonthDataForDashboard(monthIdx) {
+            const tempRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            window.fbGet(tempRef).then((snapshot) => {
+                const saved = snapshot.val();
+                processDashboardMonthDataOnly(monthIdx, saved);
+                renderDashboard(activeDashboardMonth);
+            }).catch(console.error);
+        }
+
+        function processDashboardMonthDataOnly(monthIdx, saved) {
+            const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
+            let north = [];
+            let south = [];
+            for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
+                const dateObj = new Date(currentYear, monthIdx, dayNum);
+                const dayOfWeek = dateObj.getDay(); 
+                if (dayOfWeek === 5 || dayOfWeek === 6) continue;
+                const hDayName = hebrewDaysShort[dayOfWeek];
+                north.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] });
+                south.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] });
+            }
+            if (saved) {
+                if (saved.north && (Array.isArray(saved.north) || typeof saved.north === 'object')) {
+                    const northArr = Array.isArray(saved.north) ? saved.north : Object.values(saved.north);
+                    north = northArr.map(item => ({
+                        id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
+                        dayNum: item.dayNum,
+                        values: normalizeRowValues(item.values)
+                    }));
+                }
+                if (saved.south && (Array.isArray(saved.south) || typeof saved.south === 'object')) {
+                    const southArr = Array.isArray(saved.south) ? saved.south : Object.values(saved.south);
+                    south = southArr.map(item => ({
+                        id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
+                        dayNum: item.dayNum,
+                        values: normalizeRowValues(item.values)
+                    }));
+                }
+            }
+            if (!allMonthsDataCache[monthIdx]) {
+                allMonthsDataCache[monthIdx] = { north, south };
+            } else {
+                allMonthsDataCache[monthIdx].north = north;
+                allMonthsDataCache[monthIdx].south = south;
+            }
+        }
+
         function processLoadedMonthData(monthIdx, saved) {
             const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
             let north = [];
@@ -2111,8 +2158,7 @@
                     document.querySelectorAll('#dashboardMonthTabs .month-folder-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     activeDashboardMonth = idx;
-                    loadMonthDataFromCloud(activeDashboardMonth);
-                    renderDashboard(activeDashboardMonth);
+                    loadMonthDataForDashboard(activeDashboardMonth);
                 };
                 bar.appendChild(btn);
             });
@@ -2960,41 +3006,43 @@
             });
         };
 
-        window.showSecondGuideSelect = function(side, monthIdx, cacheIndex) {
+        window.showSecondGuideSelect = function(side, monthIdx, rowId) {
             const monthData = getMonthDataCache(monthIdx);
-            const rowData = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
+            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[10]) {
                     rowData.values[10] = guidesOptions[1] || "";
-                    updateCacheAndSave(side, monthIdx, cacheIndex, 10, rowData.values[10]);
+                    updateCacheAndSaveById(side, monthIdx, rowId, 10, rowData.values[10]);
                 }
             }
             renderCurrentWeekTables();
         };
 
-        window.removeSecondGuideSelect = function(side, monthIdx, cacheIndex) {
-            updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
+        window.removeSecondGuideSelect = function(side, monthIdx, rowId) {
+            updateCacheAndSaveById(side, monthIdx, rowId, 10, "");
             renderCurrentWeekTables();
         };
 
-        window.showSecondGorillaSelect = function(side, monthIdx, cacheIndex) {
+        window.showSecondGorillaSelect = function(side, monthIdx, rowId) {
             const monthData = getMonthDataCache(monthIdx);
-            const rowData = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
+            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[11]) {
                     rowData.values[11] = gorillaOptions[1] || "גורילה 1";
-                    updateCacheAndSave(side, monthIdx, cacheIndex, 11, rowData.values[11]);
+                    updateCacheAndSaveById(side, monthIdx, rowId, 11, rowData.values[11]);
                 }
             }
             renderCurrentWeekTables();
         };
 
-        window.removeSecondGorillaSelect = function(side, monthIdx, cacheIndex) {
-            updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
+        window.removeSecondGorillaSelect = function(side, monthIdx, rowId) {
+            updateCacheAndSaveById(side, monthIdx, rowId, 11, "");
             renderCurrentWeekTables();
         };
 
-        window.handleGuideSelection = function(side, monthIdx, cacheIndex, fieldIndex, selectEl) {
+        window.handleGuideSelection = function(side, monthIdx, rowId, fieldIndex, selectEl) {
             let val = selectEl.value;
             if (val === "אחר...") {
                 let customName = prompt("הזן את שם המדריך:");
@@ -3008,7 +3056,8 @@
             handleSelectChange(selectEl);
 
             const monthData = getMonthDataCache(monthIdx);
-            const row = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
+            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const row = monthData[side][cacheIndex];
 
             if (row) {
                 if (!Array.isArray(row.values)) row.values = Array(13).fill("");
@@ -3077,17 +3126,17 @@
                 <td>
                     <div class="guides-container">
                         <div class="guide-row-flex">
-                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_1" class="cell-select ${guide1Val ? 'has-selection' : ''}" onchange="handleGuideSelection('${side}', ${monthIdx}, ${cacheIndex}, 1, this)">
+                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_1" class="cell-select ${guide1Val ? 'has-selection' : ''}" onchange="handleGuideSelection('${side}', ${monthIdx}, '${rowId}', 1, this)">
                                 ${localGuides1.map(g => `<option value="${escapeHtml(g)}" ${guide1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
-                            ${hasGuide1 && !hasGuide2 ? `<button type="button" class="add-guide-btn" onclick="showSecondGuideSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הוסף מדריך נוסף">➕</button>` : ''}
+                            ${hasGuide1 && !hasGuide2 ? `<button type="button" class="add-guide-btn" onclick="showSecondGuideSelect('${side}', ${monthIdx}, '${rowId}')" title="הוסף מדריך נוסף">➕</button>` : ''}
                         </div>
                         ${hasGuide2 ? `
                         <div class="guide-row-flex">
-                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_10" class="cell-select ${guide2Val ? 'has-selection' : ''}" onchange="handleGuideSelection('${side}', ${monthIdx}, ${cacheIndex}, 10, this)">
+                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_10" class="cell-select ${guide2Val ? 'has-selection' : ''}" onchange="handleGuideSelection('${side}', ${monthIdx}, '${rowId}', 10, this)">
                                 ${localGuides2.map(g => `<option value="${escapeHtml(g)}" ${guide2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
-                            <button type="button" class="remove-guide-btn" onclick="removeSecondGuideSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הסר מדריך שני">❌</button>
+                            <button type="button" class="remove-guide-btn" onclick="removeSecondGuideSelect('${side}', ${monthIdx}, '${rowId}')" title="הסר מדריך שני">❌</button>
                         </div>
                         ` : ''}
                     </div>
@@ -3106,14 +3155,14 @@
                             <select id="cell_${side}_${monthIdx}_${cacheIndex}_7" class="cell-select ${gorilla1Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 7, this.value); renderCurrentWeekTables();">
                                 ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
-                            ${hasGorilla1 && !hasGorilla2 ? `<button type="button" class="add-gorilla-btn" onclick="showSecondGorillaSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הוסף גורילה נוספת">➕</button>` : ''}
+                            ${hasGorilla1 && !hasGorilla2 ? `<button type="button" class="add-gorilla-btn" onclick="showSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הוסף גורילה נוספת">➕</button>` : ''}
                         </div>
                         ${hasGorilla2 ? `
                         <div class="gorilla-row-flex">
                             <select id="cell_${side}_${monthIdx}_${cacheIndex}_11" class="cell-select ${gorilla2Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 11, this.value)">
                                 ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
-                            <button type="button" class="remove-gorilla-btn" onclick="removeSecondGorillaSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הסר גורילה שנייה">❌</button>
+                            <button type="button" class="remove-gorilla-btn" onclick="removeSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הסר גורילה שנייה">❌</button>
                         </div>
                         ` : ''}
                     </div>
@@ -3188,6 +3237,14 @@
                 renderDashboard(activeDashboardMonth);
             }
         };
+
+        function updateCacheAndSaveById(side, monthIdx, rowId, fieldIndex, value) {
+            const monthData = getMonthDataCache(monthIdx);
+            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            if (cacheIndex !== -1) {
+                updateCacheAndSave(side, monthIdx, cacheIndex, fieldIndex, value);
+            }
+        }
 
         function saveSideArrayToCloud(side, monthIdx) {
             const monthData = getMonthDataCache(monthIdx);

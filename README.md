@@ -1,5 +1,4 @@
-[gemini-code-1787130497813.html](https://github.com/user-attachments/files/31347776/gemini-code-1787130497813.html)
-# gil-ops<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">

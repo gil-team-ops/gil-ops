@@ -1851,21 +1851,23 @@
         window.debouncedFilterForms = debounce(filterFormsTab, 100);
 
         function normalizeRowValues(val) {
+            const arr = [];
             if (Array.isArray(val)) {
-                const arr = [...val];
-                while (arr.length < 13) arr.push("");
+                for (let i = 0; i < 13; i++) {
+                    arr[i] = (val[i] !== undefined && val[i] !== null) ? String(val[i]) : "";
+                }
                 return arr;
             }
-            const arr = Array(13).fill("");
+            const result = Array(13).fill("");
             if (val && typeof val === 'object') {
                 Object.keys(val).forEach(k => {
                     const idx = parseInt(k, 10);
                     if (!isNaN(idx) && idx >= 0 && idx < 13) {
-                        arr[idx] = val[k] != null ? String(val[k]) : "";
+                        result[idx] = val[k] != null ? String(val[k]) : "";
                     }
                 });
             }
-            return arr;
+            return result;
         }
 
         window.addEventListener('firebase-ready', () => {
@@ -3152,14 +3154,14 @@
                 <td>
                     <div class="gorillas-container">
                         <div class="gorilla-row-flex">
-                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_7" class="cell-select ${gorilla1Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 7, this.value); renderCurrentWeekTables();">
+                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_7" class="cell-select ${gorilla1Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 7, this.value); renderCurrentWeekTables();">
                                 ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
                             ${hasGorilla1 && !hasGorilla2 ? `<button type="button" class="add-gorilla-btn" onclick="showSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הוסף גורילה נוספת">➕</button>` : ''}
                         </div>
                         ${hasGorilla2 ? `
                         <div class="gorilla-row-flex">
-                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_11" class="cell-select ${gorilla2Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 11, this.value)">
+                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_11" class="cell-select ${gorilla2Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 11, this.value)">
                                 ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
                             <button type="button" class="remove-gorilla-btn" onclick="removeSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הסר גורילה שנייה">❌</button>
@@ -3171,23 +3173,23 @@
 
             return `
                 <td>
-                    <input id="cell_${side}_${monthIdx}_${cacheIndex}_0" type="text" class="cell-input" value="${escapeHtml(currentVal)}" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 0, this.value)">
+                    <input id="cell_${side}_${monthIdx}_${cacheIndex}_0" type="text" class="cell-input" value="${escapeHtml(currentVal)}" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 0, this.value)">
                     ${extraBadge}
                 </td>
                 ${guideCellHTML}
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_2" type="text" class="cell-input" value="${escapeHtml(vals[2] || '')}" placeholder="כוח מתאמן" list="mem-units" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 2, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_3" type="text" class="cell-input" value="${escapeHtml(vals[3] || '')}" placeholder="מיקום" list="mem-locations" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 3, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_2" type="text" class="cell-input" value="${escapeHtml(vals[2] || '')}" placeholder="כוח מתאמן" list="mem-units" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 2, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_3" type="text" class="cell-input" value="${escapeHtml(vals[3] || '')}" placeholder="מיקום" list="mem-locations" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 3, this.value)"></td>
                 <td>
-                    <select id="cell_${side}_${monthIdx}_${cacheIndex}_4" class="cell-select ${vals[4] ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 4, this.value)">
+                    <select id="cell_${side}_${monthIdx}_${cacheIndex}_4" class="cell-select ${vals[4] ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 4, this.value)">
                         ${systemsOptions.map(s => `<option value="${escapeHtml(s)}" ${vals[4] === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
                     </select>
                 </td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_5" type="text" class="cell-input" value="${escapeHtml(vals[5] || '')}" placeholder="איש קשר" list="mem-contacts" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 5, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_6" type="text" class="cell-input" value="${escapeHtml(vals[6] || '')}" placeholder="מס'" list="mem-count" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 6, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_5" type="text" class="cell-input" value="${escapeHtml(vals[5] || '')}" placeholder="איש קשר" list="mem-contacts" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 5, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_6" type="text" class="cell-input" value="${escapeHtml(vals[6] || '')}" placeholder="מס'" list="mem-count" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 6, this.value)"></td>
                 ${gorillaCellHTML}
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_8" type="text" class="cell-input" value="${escapeHtml(vals[8] || '')}" placeholder="שעות" list="mem-hours" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 8, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_9" type="text" class="cell-input" value="${escapeHtml(vals[9] || '')}" placeholder="הערות" list="mem-notes" onchange="handleNotesChange('${side}', ${monthIdx}, ${cacheIndex}, this.value)"></td>
-                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_12" type="text" class="cell-input" value="${escapeHtml(vals[12] || '')}" placeholder="ניידת" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 12, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_8" type="text" class="cell-input" value="${escapeHtml(vals[8] || '')}" placeholder="שעות" list="mem-hours" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 8, this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_9" type="text" class="cell-input" value="${escapeHtml(vals[9] || '')}" placeholder="הערות" list="mem-notes" onchange="handleNotesChangeById('${side}', ${monthIdx}, '${rowId}', this.value)"></td>
+                <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_12" type="text" class="cell-input" value="${escapeHtml(vals[12] || '')}" placeholder="ניידת" onchange="updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 12, this.value)"></td>
             `;
         }
 
@@ -3196,11 +3198,11 @@
             else selectEl.classList.remove('has-selection');
         }
 
-        window.handleNotesChange = function(side, monthIdx, cacheIndex, value) {
-            updateCacheAndSave(side, monthIdx, cacheIndex, 9, value);
+        window.handleNotesChangeById = function(side, monthIdx, rowId, value) {
+            updateCacheAndSaveById(side, monthIdx, rowId, 9, value);
             
             if (value && value.trim().includes("טיפול חודשי")) {
-                updateCacheAndSave(side, monthIdx, cacheIndex, 2, "טיפול חודשי");
+                updateCacheAndSaveById(side, monthIdx, rowId, 2, "טיפול חודשי");
             }
             
             renderCurrentWeekTables();
@@ -3238,7 +3240,7 @@
             }
         };
 
-        function updateCacheAndSaveById(side, monthIdx, rowId, fieldIndex, value) {
+        window.updateCacheAndSaveById = function(side, monthIdx, rowId, fieldIndex, value) {
             const monthData = getMonthDataCache(monthIdx);
             const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
             if (cacheIndex !== -1) {
@@ -3257,7 +3259,11 @@
             }));
 
             const sideRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}/${side}`);
-            window.fbSet(sideRef, cleanArray).catch(console.error);
+            try {
+                window.fbSet(sideRef, cleanArray).catch(console.error);
+            } catch (err) {
+                console.error("Failed to save (validation error):", err);
+            }
         }
 
         function initCloudStatusSync() {

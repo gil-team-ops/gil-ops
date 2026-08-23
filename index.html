@@ -3002,9 +3002,9 @@
                 }
 
                 monthData[side].splice(idx, 1);
-                saveSideArrayToCloud(side, monthIdx);
                 renderCurrentWeekTables();
                 renderDashboard(activeDashboardMonth);
+                saveSideArrayToCloud(side, monthIdx);
             });
         };
 
@@ -3091,7 +3091,12 @@
                     }
                 }
 
-                window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+                try {
+                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+                } catch (err) {
+                    console.error("Failed fbUpdate:", err);
+                }
+
                 extractMemory(row.values);
                 rebuildDatalists();
             }
@@ -3232,7 +3237,11 @@
                     }
                 }
 
-                window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+                try {
+                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+                } catch (err) {
+                    console.error("Failed fbUpdate:", err);
+                }
 
                 extractMemory(targetRow.values);
                 rebuildDatalists();

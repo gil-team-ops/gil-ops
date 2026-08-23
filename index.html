@@ -15,7 +15,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, get, update, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, get, update, push, remove, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCdqf9bo_mMiMxjXU24zMnrDgX4qTLcHwM",
@@ -40,6 +40,7 @@
         window.fbUpdate = update;
         window.fbOnValue = onValue;
         window.fbGet = get;
+        window.fbOff = off;
 
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
@@ -1044,8 +1045,83 @@
 
             <!-- לשונית דשבורד סטטיסטי -->
             <section id="dashboard" class="tab-content">
-                <h2>📈 דשבורד סטטיסטי</h2>
-                <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
+                <div class="dashboard-header">
+                    <h2>📈 דשבורד סטטיסטי</h2>
+                    <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
+                </div>
+
+                <!-- 4 כרטיסי KPI עליונים -->
+                <div class="dashboard-kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiTotalGorillas" style="color: #64748b;">7</div>
+                        <div class="kpi-title">סה"כ גורילות</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiHealthyGorillas" style="color: #22c55e;">0</div>
+                        <div class="kpi-title">✅ תקינות</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiFaultyGorillas" style="color: #ef4444;">0</div>
+                        <div class="kpi-title">⚠️ לא תקינות</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <span id="kpiMonthTrainingDays" style="color: #0284c7;">0</span>
+                            <span style="color: #64748b; font-size: 0.8em;">/</span>
+                            <span id="kpiMonthCanceledDays" style="color: #ef4444;">0</span>
+                        </div>
+                        <div class="kpi-title">📅 ימי אימון חודשי <span style="color: #ef4444; font-size: 0.9em;">(ימים שבוטלו)</span></div>
+                    </div>
+                </div>
+
+                <!-- גריד מרכזי: נתוני פעילות חודשית + נתוני גורילות -->
+                <div class="dashboard-main-grid">
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-title">
+                            <span>📊 נתוני גורילות (ימים מאז טיפול מול ימי אימון)</span>
+                            <span id="chartMonthLabel" style="font-size:0.8em; color:#0284c7;"></span>
+                        </div>
+                        <div style="position: relative; height: 280px; width: 100%;">
+                            <canvas id="gorillaBarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-title">
+                            <span>📋 סיכום פעילות - <span id="statsMonthTitle"></span></span>
+                        </div>
+                        <div class="stats-items-list">
+                            <div class="stat-item-row">
+                                <span class="stat-item-label">👥 סה"כ מתאמנים:</span>
+                                <span class="stat-item-value" id="dashTotalTrainees">0</span>
+                            </div>
+                            <div class="stat-item-row">
+                                <span class="stat-item-label">⏱️ סה"כ שעות פעילות (הערכה):</span>
+                                <span class="stat-item-value" id="dashTotalHours">0 שעות</span>
+                            </div>
+                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                                <span class="stat-item-label">📍 מיקומי אימון בחודש:</span>
+                                <div class="badges-wrap" id="dashLocationsList"></div>
+                            </div>
+                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                                <span class="stat-item-label">🛡️ כוחות מתאמנים (יחידות):</span>
+                                <div class="badges-wrap" id="dashUnitsList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ריכוז תקלות פתוחות -->
+                <div class="faults-section">
+                    <div class="dashboard-box-title" style="border-bottom-color: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                        <span>🔧 תקלות פתוחות כרגע</span>
+                        <span id="faultsCountBadge" style="font-size: 0.8em; background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px;">0 תקלות</span>
+                    </div>
+                    <div id="openFaultsContainer"></div>
+                </div>
+
+                <!-- סרגל חודשים בתחתית הדשבורד -->
+                <div class="month-folders-bar" id="dashboardMonthTabs"></div>
             </section>
 
             <!-- לשונית משימות To-Do -->
@@ -1672,6 +1748,18 @@
         </div>
     </div>
 
+    <!-- מודאל אישור מחיקה מותאם אישית (מונע בעיות בדפדפני מובייל) -->
+    <div id="customConfirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:100000; align-items:center; justify-content:center; padding:20px;">
+        <div class="login-card" style="text-align:right; max-width:380px; width:100%; border:2px solid #ef4444;">
+            <h3 style="margin-top:0; color:#ef4444; font-size:1.15em;">⚠️ אישור מחיקה</h3>
+            <p id="customConfirmText" style="font-size:0.95em; color:#cbd5e1; margin-bottom:20px; font-weight:600;"></p>
+            <div style="display:flex; gap:10px;">
+                <button type="button" id="customConfirmYes" class="login-btn" style="background:#ef4444;">מחק 🗑️</button>
+                <button type="button" id="customConfirmNo" class="login-btn" style="background:#64748b;">ביטול ❌</button>
+            </div>
+        </div>
+    </div>
+
     <!-- מודאל תזכורת משימות בכניסה למערכת -->
     <div id="loginTodoReminderModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:100000; align-items:center; justify-content:center; padding:20px;">
         <div class="login-card" style="text-align:right; max-width:480px; width:100%; border:2px solid #0284c7; box-shadow:0 12px 30px rgba(0,0,0,0.6);">
@@ -1700,6 +1788,7 @@
         let gorillaChartInstance = null;
         let latestStatusData = {};
         let latestTodosData = {};
+        let activeListeners = {};
 
         const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
@@ -1733,10 +1822,13 @@
 
         function getAirForceWeek(date) {
             const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const julyFirst = new Date(currentYear, 6, 1);
-            const dayOfWeek = julyFirst.getDay();
-            const firstSunday = new Date(currentYear, 6, 1 - dayOfWeek);
-            
+            const targetYear = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
+            const julyFirst = new Date(targetYear, 6, 1);
+            let firstSunday = new Date(targetYear, 6, 1 - julyFirst.getDay());
+            if (d < firstSunday) {
+                const prevJulyFirst = new Date(targetYear - 1, 6, 1);
+                firstSunday = new Date(targetYear - 1, 6, 1 - prevJulyFirst.getDay());
+            }
             const diffTime = d - firstSunday;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             const weekOffset = Math.floor(diffDays / 7);
@@ -1797,13 +1889,18 @@
         });
 
         function loadMonthDataFromCloud(monthIdx) {
+            if (activeListeners[monthIdx]) {
+                window.fbOff(window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`), 'value', activeListeners[monthIdx]);
+            }
             const sheetRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
-            window.fbOnValue(sheetRef, (snapshot) => {
+            const callback = (snapshot) => {
                 const saved = snapshot.val();
                 processLoadedMonthData(monthIdx, saved);
                 renderCurrentWeekTables();
                 renderDashboard(activeDashboardMonth);
-            });
+            };
+            activeListeners[monthIdx] = callback;
+            window.fbOnValue(sheetRef, callback);
         }
 
         function processLoadedMonthData(monthIdx, saved) {
@@ -1819,8 +1916,8 @@
                 let defaultGuideNorth = "איתי הקר";
                 let defaultGuideSouth = "עדיאל קסה";
 
-                north.push({ dayNum, hDayName, isWeekend: false, values: ["", defaultGuideNorth, "", "", "", "", "", "", "", "", "", "", ""] });
-                south.push({ dayNum, hDayName, isWeekend: false, values: ["", defaultGuideSouth, "", "", "", "", "", "", "", "", "", "", ""] });
+                north.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", defaultGuideNorth, "", "", "", "", "", "", "", "", "", "", ""] });
+                south.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", defaultGuideSouth, "", "", "", "", "", "", "", "", "", "", ""] });
             }
 
             if (saved) {
@@ -1838,6 +1935,7 @@
                             currentVals[1] = defaultGuideNorth;
                         }
                         return {
+                            id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
                             dayNum: item.dayNum,
                             hDayName: hebrewDaysShort[dateObj.getDay()],
                             isWeekend: false,
@@ -1860,6 +1958,7 @@
                             currentVals[1] = defaultGuideSouth;
                         }
                         return {
+                            id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
                             dayNum: item.dayNum,
                             hDayName: hebrewDaysShort[dateObj.getDay()],
                             isWeekend: false,
@@ -1972,12 +2071,12 @@
             let container = document.getElementById('datalistsContainer');
             if (!container) return;
             container.innerHTML = `
-                <datalist id="mem-units">${Array.from(memoryData.units).map(v => `<option value="${v}">`).join('')}</datalist>
-                <datalist id="mem-locations">${Array.from(memoryData.locations).map(v => `<option value="${v}">`).join('')}</datalist>
-                <datalist id="mem-contacts">${Array.from(memoryData.contacts).map(v => `<option value="${v}">`).join('')}</datalist>
-                <datalist id="mem-count">${Array.from(memoryData.traineesCount).map(v => `<option value="${v}">`).join('')}</datalist>
-                <datalist id="mem-hours">${Array.from(memoryData.hours).map(v => `<option value="${v}">`).join('')}</datalist>
-                <datalist id="mem-notes">${Array.from(memoryData.notes).map(v => `<option value="${v}">`).join('')}</datalist>
+                <datalist id="mem-units">${Array.from(memoryData.units).map(v => `<option value="${escapeHtml(v)}">`).join('')}</datalist>
+                <datalist id="mem-locations">${Array.from(memoryData.locations).map(v => `<option value="${escapeHtml(v)}">`).join('')}</datalist>
+                <datalist id="mem-contacts">${Array.from(memoryData.contacts).map(v => `<option value="${escapeHtml(v)}">`).join('')}</datalist>
+                <datalist id="mem-count">${Array.from(memoryData.traineesCount).map(v => `<option value="${escapeHtml(v)}">`).join('')}</datalist>
+                <datalist id="mem-hours">${Array.from(memoryData.hours).map(v => `<option value="${escapeHtml(v)}">`).join('')}</datalist>
+                <datalist id="mem-notes">${Array.from(memoryData.notes).map(v => `<option value="${escapeHtml(v)}">`).join('')}</datalist>
             `;
         }
 
@@ -2080,45 +2179,53 @@
                 const monthData = getMonthDataCache(dayInfo.month);
                 const isToday = (currentYear === today.getFullYear() && dayInfo.month === today.getMonth() && dayInfo.day === today.getDate());
 
-                let northRows = monthData.north.filter(item => item.dayNum === dayInfo.day);
-                let southRows = monthData.south.filter(item => item.dayNum === dayInfo.day);
+                let northRowsWithIndex = [];
+                monthData.north.forEach((item, idx) => {
+                    if (item.dayNum === dayInfo.day) northRowsWithIndex.push({ item, idx });
+                });
 
-                if (northRows.length === 0) {
-                    const defObj = { dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] };
+                let southRowsWithIndex = [];
+                monthData.south.forEach((item, idx) => {
+                    if (item.dayNum === dayInfo.day) southRowsWithIndex.push({ item, idx });
+                });
+
+                if (northRowsWithIndex.length === 0) {
+                    const defObj = { id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] };
                     monthData.north.push(defObj);
                     monthData.north.sort((a, b) => a.dayNum - b.dayNum);
-                    northRows = [defObj];
-                }
-                if (southRows.length === 0) {
-                    const defObj = { dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] };
-                    monthData.south.push(defObj);
-                    monthData.south.sort((a, b) => a.dayNum - b.dayNum);
-                    southRows = [defObj];
+                    const newIdx = monthData.north.indexOf(defObj);
+                    northRowsWithIndex.push({ item: defObj, idx: newIdx });
                 }
 
-                northRows.forEach((nData, index) => {
+                if (southRowsWithIndex.length === 0) {
+                    const defObj = { id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] };
+                    monthData.south.push(defObj);
+                    monthData.south.sort((a, b) => a.dayNum - b.dayNum);
+                    const newIdx = monthData.south.indexOf(defObj);
+                    southRowsWithIndex.push({ item: defObj, idx: newIdx });
+                }
+
+                northRowsWithIndex.forEach((rowObj, index) => {
                     const trNorth = document.createElement('tr');
-                    const notes = nData.values[9] || '';
+                    const notes = rowObj.item.values[9] || '';
                     const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
 
                     if (isToday) trNorth.className = 'today-row';
                     else if (isCanceled) trNorth.className = 'canceled-row';
 
-                    const actualIndex = monthData.north.indexOf(nData);
-                    trNorth.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, nData.values, 'north', dayInfo.month, actualIndex, index > 0);
+                    trNorth.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, rowObj.item.values, 'north', dayInfo.month, rowObj.item.id, index > 0);
                     northBody.appendChild(trNorth);
                 });
 
-                southRows.forEach((sData, index) => {
+                southRowsWithIndex.forEach((rowObj, index) => {
                     const trSouth = document.createElement('tr');
-                    const notes = sData.values[9] || '';
+                    const notes = rowObj.item.values[9] || '';
                     const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
 
                     if (isToday) trSouth.className = 'today-row';
                     else if (isCanceled) trSouth.className = 'canceled-row';
 
-                    const actualIndex = monthData.south.indexOf(sData);
-                    trSouth.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, sData.values, 'south', dayInfo.month, actualIndex, index > 0);
+                    trSouth.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, rowObj.item.values, 'south', dayInfo.month, rowObj.item.id, index > 0);
                     southBody.appendChild(trSouth);
                 });
             });
@@ -2374,9 +2481,10 @@
         };
 
         window.deleteTodo = function(id) {
-            if (!confirm("האם למחוק משימה זו?")) return;
-            const itemRef = window.fbRef(window.fbDB, `todos/${id}`);
-            window.fbRemove(itemRef).catch(console.error);
+            showCustomConfirm("האם למחוק משימה זו?", () => {
+                const itemRef = window.fbRef(window.fbDB, `todos/${id}`);
+                window.fbRemove(itemRef).catch(console.error);
+            });
         };
 
         window.openEditTodoModal = function(id) {
@@ -2789,6 +2897,7 @@
             const newValues = [`${dateStr} ${hDayName}`, defGuide, "", "", "", "", "", "", "", "", "", "", ""];
 
             const newRow = {
+                id: 'row_' + Math.random().toString(36).substr(2, 9),
                 dayNum: dayNum,
                 hDayName: hDayName,
                 isWeekend: false,
@@ -2808,23 +2917,47 @@
             renderDashboard(activeDashboardMonth);
         };
 
-        window.removeExtraRow = function(side, monthIdx, cacheIndex, event) {
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.getElementById('customConfirmModal');
+            const textEl = document.getElementById('customConfirmText');
+            const yesBtn = document.getElementById('customConfirmYes');
+            const noBtn = document.getElementById('customConfirmNo');
+            if (!modal) {
+                if (confirm(message)) onConfirm();
+                return;
+            }
+            textEl.innerText = message;
+            yesBtn.onclick = () => {
+                modal.style.display = 'none';
+                onConfirm();
+            };
+            noBtn.onclick = () => {
+                modal.style.display = 'none';
+            };
+            modal.style.display = 'flex';
+        }
+
+        window.removeExtraRow = function(side, monthIdx, rowId, event) {
             if (event) {
                 event.stopPropagation();
                 event.preventDefault();
             }
-            if (!confirm("האם אתה בטוח שברצונך למחוק שורה נוספת זו?")) return;
-            
-            const monthData = getMonthDataCache(monthIdx);
-            if (!monthData || !monthData[side] || cacheIndex < 0 || cacheIndex >= monthData[side].length) {
-                console.error("Invalid index for deletion", cacheIndex);
-                return;
-            }
 
-            monthData[side].splice(cacheIndex, 1);
-            saveSideArrayToCloud(side, monthIdx);
-            renderCurrentWeekTables();
-            renderDashboard(activeDashboardMonth);
+            showCustomConfirm("האם אתה בטוח שברצונך למחוק שורה נוספת זו?", () => {
+                const monthData = getMonthDataCache(monthIdx);
+                if (!monthData || !monthData[side]) return;
+
+                const idx = monthData[side].findIndex(r => r.id === rowId);
+                if (idx === -1) {
+                    console.error("Row not found for deletion", rowId);
+                    return;
+                }
+
+                monthData[side].splice(idx, 1);
+                saveSideArrayToCloud(side, monthIdx);
+                renderCurrentWeekTables();
+                renderDashboard(activeDashboardMonth);
+            });
         };
 
         window.showSecondGuideSelect = function(side, monthIdx, cacheIndex) {
@@ -2896,10 +3029,11 @@
 
                     if (window.trainerGorillaMap[val]) {
                         const defaults = window.trainerGorillaMap[val];
-                        row.values[7] = defaults[0];
-                        updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/7`] = defaults[0];
-
-                        if (defaults[1]) {
+                        if (!row.values[7]) {
+                            row.values[7] = defaults[0];
+                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/7`] = defaults[0];
+                        }
+                        if (defaults[1] && !row.values[11]) {
                             row.values[11] = defaults[1];
                             updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/11`] = defaults[1];
                         }
@@ -2915,10 +3049,14 @@
             renderDashboard(activeDashboardMonth);
         };
 
-        function buildRowHTML(dayNum, hDayName, vals, side, monthIdx, cacheIndex, isExtra) {
+        function buildRowHTML(dayNum, hDayName, vals, side, monthIdx, rowId, isExtra) {
             const dateStr = `${String(dayNum).padStart(2, '0')}.${String(monthIdx + 1).padStart(2, '0')}`;
             const currentVal = vals[0] || `${dateStr} ${hDayName}`;
-            const extraBadge = isExtra ? `<button type="button" class="remove-extra-row-btn" onclick="window.removeExtraRow('${side}', ${monthIdx}, ${cacheIndex}, event)" title="מחק שורה נוספת זו">❌ מחק שורה</button>` : '';
+            
+            const monthData = getMonthDataCache(monthIdx);
+            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+
+            const extraBadge = isExtra ? `<button type="button" class="remove-extra-row-btn" onclick="window.removeExtraRow('${side}', ${monthIdx}, '${rowId}', event)" title="מחק שורה נוספת זו">❌ מחק שורה</button>` : '';
 
             const guide1Val = vals[1] || '';
             const guide2Val = vals[10] || '';
@@ -2940,14 +3078,14 @@
                     <div class="guides-container">
                         <div class="guide-row-flex">
                             <select id="cell_${side}_${monthIdx}_${cacheIndex}_1" class="cell-select ${guide1Val ? 'has-selection' : ''}" onchange="handleGuideSelection('${side}', ${monthIdx}, ${cacheIndex}, 1, this)">
-                                ${localGuides1.map(g => `<option value="${g}" ${guide1Val === g ? 'selected' : ''}>${g}</option>`).join('')}
+                                ${localGuides1.map(g => `<option value="${escapeHtml(g)}" ${guide1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
                             ${hasGuide1 && !hasGuide2 ? `<button type="button" class="add-guide-btn" onclick="showSecondGuideSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הוסף מדריך נוסף">➕</button>` : ''}
                         </div>
                         ${hasGuide2 ? `
                         <div class="guide-row-flex">
                             <select id="cell_${side}_${monthIdx}_${cacheIndex}_10" class="cell-select ${guide2Val ? 'has-selection' : ''}" onchange="handleGuideSelection('${side}', ${monthIdx}, ${cacheIndex}, 10, this)">
-                                ${localGuides2.map(g => `<option value="${g}" ${guide2Val === g ? 'selected' : ''}>${g}</option>`).join('')}
+                                ${localGuides2.map(g => `<option value="${escapeHtml(g)}" ${guide2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
                             <button type="button" class="remove-guide-btn" onclick="removeSecondGuideSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הסר מדריך שני">❌</button>
                         </div>
@@ -2966,14 +3104,14 @@
                     <div class="gorillas-container">
                         <div class="gorilla-row-flex">
                             <select id="cell_${side}_${monthIdx}_${cacheIndex}_7" class="cell-select ${gorilla1Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 7, this.value); renderCurrentWeekTables();">
-                                ${gorillaOptions.map(g => `<option value="${g}" ${gorilla1Val === g ? 'selected' : ''}>${g}</option>`).join('')}
+                                ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
                             ${hasGorilla1 && !hasGorilla2 ? `<button type="button" class="add-gorilla-btn" onclick="showSecondGorillaSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הוסף גורילה נוספת">➕</button>` : ''}
                         </div>
                         ${hasGorilla2 ? `
                         <div class="gorilla-row-flex">
                             <select id="cell_${side}_${monthIdx}_${cacheIndex}_11" class="cell-select ${gorilla2Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 11, this.value)">
-                                ${gorillaOptions.map(g => `<option value="${g}" ${gorilla2Val === g ? 'selected' : ''}>${g}</option>`).join('')}
+                                ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                             </select>
                             <button type="button" class="remove-gorilla-btn" onclick="removeSecondGorillaSelect('${side}', ${monthIdx}, ${cacheIndex})" title="הסר גורילה שנייה">❌</button>
                         </div>
@@ -2992,7 +3130,7 @@
                 <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_3" type="text" class="cell-input" value="${escapeHtml(vals[3] || '')}" placeholder="מיקום" list="mem-locations" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 3, this.value)"></td>
                 <td>
                     <select id="cell_${side}_${monthIdx}_${cacheIndex}_4" class="cell-select ${vals[4] ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 4, this.value)">
-                        ${systemsOptions.map(s => `<option value="${s}" ${vals[4] === s ? 'selected' : ''}>${s}</option>`).join('')}
+                        ${systemsOptions.map(s => `<option value="${escapeHtml(s)}" ${vals[4] === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
                     </select>
                 </td>
                 <td><input id="cell_${side}_${monthIdx}_${cacheIndex}_5" type="text" class="cell-input" value="${escapeHtml(vals[5] || '')}" placeholder="איש קשר" list="mem-contacts" onchange="updateCacheAndSave('${side}', ${monthIdx}, ${cacheIndex}, 5, this.value)"></td>
@@ -3054,6 +3192,7 @@
         function saveSideArrayToCloud(side, monthIdx) {
             const monthData = getMonthDataCache(monthIdx);
             const cleanArray = monthData[side].map(item => ({
+                id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
                 dayNum: item.dayNum,
                 values: normalizeRowValues(item.values),
                 hasUserModifiedGuide1: !!item.hasUserModifiedGuide1,
@@ -3061,10 +3200,7 @@
             }));
 
             const sideRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}/${side}`);
-            window.fbSet(sideRef, cleanArray).then(() => {
-                renderCurrentWeekTables();
-                renderDashboard(activeDashboardMonth);
-            }).catch(console.error);
+            window.fbSet(sideRef, cleanArray).catch(console.error);
         }
 
         function initCloudStatusSync() {
@@ -3157,24 +3293,26 @@
         window.initTrainerProfile = function(currentUser) {
             let trainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
             
-            if (!trainer && currentUser && currentUser.email) {
+            if (currentUser && currentUser.email) {
                 const emailKey = currentUser.email.toLowerCase();
-                if (window.knownTrainers && window.knownTrainers[emailKey]) {
-                    trainer = {
-                        firstName: window.knownTrainers[emailKey].firstName,
-                        lastName: window.knownTrainers[emailKey].lastName,
-                        email: currentUser.email,
-                        phone: window.knownTrainers[emailKey].phone || ""
-                    };
-                } else {
-                    trainer = {
-                        firstName: currentUser.email.split('@')[0],
-                        lastName: "",
-                        email: currentUser.email,
-                        phone: ""
-                    };
+                if (!trainer || trainer.email !== currentUser.email) {
+                    if (window.knownTrainers && window.knownTrainers[emailKey]) {
+                        trainer = {
+                            firstName: window.knownTrainers[emailKey].firstName,
+                            lastName: window.knownTrainers[emailKey].lastName,
+                            email: currentUser.email,
+                            phone: window.knownTrainers[emailKey].phone || ""
+                        };
+                    } else {
+                        trainer = {
+                            firstName: currentUser.email.split('@')[0],
+                            lastName: "",
+                            email: currentUser.email,
+                            phone: ""
+                        };
+                    }
+                    localStorage.setItem('gorilla_trainer_profile', JSON.stringify(trainer));
                 }
-                localStorage.setItem('gorilla_trainer_profile', JSON.stringify(trainer));
             }
 
             const headerAvatar = document.getElementById('userHeaderAvatar');

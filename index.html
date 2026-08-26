@@ -61,26 +61,29 @@
                 const trainersRef = ref(db, 'trainers_directory');
                 const snapshot = await get(trainersRef);
                 const data = snapshot.val();
-                if (data) {
-                    window.knownTrainers = {};
-                    Object.values(data).forEach(t => {
-                        if (t.email) window.knownTrainers[t.email.toLowerCase()] = t;
-                    });
-                } else {
-                    const defaultDir = {
-                        "itayhaker19@gmail.com": { firstName: "איתי", lastName: "הקר", phone: "", email: "itayhaker19@gmail.com" },
-                        "adielkassa@gmail.com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209", email: "adielkassa@gmail.com" },
-                        "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231", email: "reemkayzer@gmail.com" },
-                        "nadavyichye@gmail.com": { firstName: "נדב", lastName: "יחיא", phone: "", email: "nadavyichye@gmail.com" },
-                        "idolevko2@gmail.com": { firstName: "עידו", lastName: "לבקוביץ", phone: "", email: "idolevko2@gmail.com" },
-                        "tomerk2001@gmail.com": { firstName: "תומר", lastName: "כחלון", phone: "", email: "tomerk2001@gmail.com" },
-                        "netashatzberg@gmail.com": { firstName: "נטע", lastName: "שצברג", phone: "", email: "netashatzberg@gmail.com" },
-                        "antonicbc@gmail.com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
-                    };
+                
+                const defaultDir = {
+                    "itayhaker19@gmail.com": { firstName: "איתי", lastName: "הקר", phone: "0508532002", email: "itayhaker19@gmail.com" },
+                    "adielkassa@gmail.com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209", email: "adielkassa@gmail.com" },
+                    "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231", email: "reemkayzer@gmail.com" },
+                    "nadavyichye@gmail.com": { firstName: "נדב", lastName: "יחיא", phone: "0528686796", email: "nadavyichye@gmail.com" },
+                    "idolevko2@gmail.com": { firstName: "עידו", lastName: "לבקוביץ", phone: "0522988181", email: "idolevko2@gmail.com" },
+                    "tomerk2001@gmail.com": { firstName: "תומר", lastName: "כחלון", phone: "0586222992", email: "tomerk2001@gmail.com" },
+                    "netashatzberg@gmail.com": { firstName: "נטע", lastName: "שצברג", phone: "0586140806", email: "netashatzberg@gmail.com" },
+                    "antonicbc@gmail.com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
+                };
+
+                // אם אין עדיין נתונים בענן, נטען את ברירת המחדל עם המספרים החדשים
+                if (!data) {
                     await set(trainersRef, defaultDir);
                     window.knownTrainers = {};
                     Object.values(defaultDir).forEach(t => {
                         window.knownTrainers[t.email.toLowerCase()] = t;
+                    });
+                } else {
+                    window.knownTrainers = {};
+                    Object.values(data).forEach(t => {
+                        if (t.email) window.knownTrainers[t.email.toLowerCase()] = t;
                     });
                 }
             } catch (err) {
@@ -152,7 +155,6 @@
                 if (authScreen) authScreen.style.display = "none";
                 if (mainContent) mainContent.style.display = "block";
                 
-                // ממתינים לטעינת ספריית המדריכים לפני הפעלת פרופיל
                 await loadKnownTrainers();
 
                 if (typeof window.initTrainerProfile === 'function') {
@@ -178,7 +180,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v3';
+                    const CACHE_NAME = 'gorilla-ops-v4';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -2882,7 +2884,7 @@
             const dateStr = `${String(dayNum).padStart(2, '0')}.${String(targetMonthIdx + 1).padStart(2, '0')}`;
             const dateObj = new Date(currentYear, targetMonthIdx, dayNum);
             const hDayName = hebrewDaysShort[dateObj.getDay()];
-            const defGuide = ""; // השארת שדה ריק לבחירה ידנית
+            const defGuide = "";
             const newValues = [`${dateStr} ${hDayName}`, defGuide, "", "", "", "", "", "", "", "", "", "", ""];
 
             const newRow = {
@@ -2954,7 +2956,7 @@
             const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[10]) {
-                    rowData.values[10] = ""; // ברירת מחדל ריקה
+                    rowData.values[10] = "";
                     updateCacheAndSaveById(side, monthIdx, rowId, 10, "");
                 }
             }
@@ -2972,7 +2974,7 @@
             const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[11]) {
-                    rowData.values[11] = ""; // ברירת מחדל ריקה
+                    rowData.values[11] = "";
                     updateCacheAndSaveById(side, monthIdx, rowId, 11, "");
                 }
             }

@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>תפעול והדרכה - צוות גיל</title>
     
+    <!-- PWA Manifest עם אייקונים מלאים ותקניים -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D7%AA%D7%A4%D7%A2%D7%95%D7%9C%20%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94%20-%20%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22short_name%22%3A%22%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%231a252f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0iIzAyODRjNyIvPjxwZXRoIGQ9Ik0xNTYgMjU2bCA4MCA4MCAxMzItMTMyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    <meta name="theme-color" content="#1a252f">
+
     <!-- Chart.js לסרגל נתונים ודשבורד אינטראקטיבי -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -49,16 +53,40 @@
             "עדיאל קסה": ["גורילה 1", "גורילה 5"]
         };
 
-        window.knownTrainers = {
-            "itayhaker19@gmail.com": { firstName: "איתי", lastName: "הקר", phone: "" },
-            "adielkassa@gmail.com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209" },
-            "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231" },
-            "nadavyichye@gmail.com": { firstName: "נדב", lastName: "יחיא", phone: "" },
-            "idolevko2@gmail.com": { firstName: "עידו", lastName: "לבקוביץ", phone: "" },
-            "tomerk2001@gmail.com": { firstName: "תומר", lastName: "כחלון", phone: "" },
-            "netashatzberg@gmail.com": { firstName: "נטע", lastName: "שצברג", phone: "" },
-            "antonicbc@gmail.com": { firstName: "מרקו", lastName: "", phone: "" }
-        };
+        window.knownTrainers = {};
+
+        // טעינה אסינכרונית ואמינה של ספריית המדריכים מתוך Firebase
+        async function loadKnownTrainers() {
+            try {
+                const trainersRef = ref(db, 'trainers_directory');
+                const snapshot = await get(trainersRef);
+                const data = snapshot.val();
+                if (data) {
+                    window.knownTrainers = {};
+                    Object.values(data).forEach(t => {
+                        if (t.email) window.knownTrainers[t.email.toLowerCase()] = t;
+                    });
+                } else {
+                    const defaultDir = {
+                        "itayhaker19@gmail.com": { firstName: "איתי", lastName: "הקר", phone: "", email: "itayhaker19@gmail.com" },
+                        "adielkassa@gmail.com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209", email: "adielkassa@gmail.com" },
+                        "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231", email: "reemkayzer@gmail.com" },
+                        "nadavyichye@gmail.com": { firstName: "נדב", lastName: "יחיא", phone: "", email: "nadavyichye@gmail.com" },
+                        "idolevko2@gmail.com": { firstName: "עידו", lastName: "לבקוביץ", phone: "", email: "idolevko2@gmail.com" },
+                        "tomerk2001@gmail.com": { firstName: "תומר", lastName: "כחלון", phone: "", email: "tomerk2001@gmail.com" },
+                        "netashatzberg@gmail.com": { firstName: "נטע", lastName: "שצברג", phone: "", email: "netashatzberg@gmail.com" },
+                        "antonicbc@gmail.com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
+                    };
+                    await set(trainersRef, defaultDir);
+                    window.knownTrainers = {};
+                    Object.values(defaultDir).forEach(t => {
+                        window.knownTrainers[t.email.toLowerCase()] = t;
+                    });
+                }
+            } catch (err) {
+                console.error("Failed loading trainers directory:", err);
+            }
+        }
 
         window.selectQuickTrainer = function(email) {
             const emailInput = document.getElementById("auth-email");
@@ -111,7 +139,7 @@
             signOut(auth);
         };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const authScreen = document.getElementById("auth-screen");
             const mainContent = document.getElementById("main-content");
             const errEl = document.getElementById("error-msg");
@@ -124,6 +152,9 @@
                 if (authScreen) authScreen.style.display = "none";
                 if (mainContent) mainContent.style.display = "block";
                 
+                // ממתינים לטעינת ספריית המדריכים לפני הפעלת פרופיל
+                await loadKnownTrainers();
+
                 if (typeof window.initTrainerProfile === 'function') {
                     window.initTrainerProfile(user);
                 }
@@ -140,6 +171,42 @@
                 }
             }
         });
+    </script>
+
+    <!-- PWA Service Worker יציב -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'gorilla-ops-v3';
+                    const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
+                    
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+                        self.skipWaiting();
+                    });
+
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(clients.claim());
+                    });
+
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            fetch(e.request).then(response => {
+                                if(response && response.status === 200 && response.type === 'basic') {
+                                    let resClone = response.clone();
+                                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, resClone));
+                                }
+                                return response;
+                            }).catch(() => caches.match(e.request))
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(console.error);
+            });
+        }
     </script>
 
     <script>
@@ -196,6 +263,21 @@
             transform: translateY(0);
         }
 
+        /* Toast הודעות שגיאה והצלחה */
+        #toastContainer {
+            position: fixed; bottom: 20px; left: 20px; z-index: 999999;
+            display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+        }
+        .toast-msg {
+            background: #1e293b; color: #f8fafc; border: 1px solid #334155; padding: 10px 16px;
+            border-radius: 8px; font-size: 0.88em; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: auto; animation: slideInUp 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .toast-msg.error { background: #fee2e2; color: #991b1b; border-color: #f87171; }
+        .toast-msg.success { background: #dcfce7; color: #166534; border-color: #4ade80; }
+        .toast-msg.warning { background: #fef9c3; color: #854d0e; border-color: #facc15; }
+        @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
         #auth-screen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; background-color: #0f172a; color: #ffffff; position: fixed;
@@ -209,39 +291,16 @@
         .login-card p { font-size: 0.85em; color: #94a3b8; margin-bottom: 15px; }
 
         .quick-trainers-wrapper {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 8px;
-            border: 1px solid #334155;
+            margin-bottom: 15px; padding: 10px; background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px; border: 1px solid #334155;
         }
-        .quick-trainers-title {
-            font-size: 0.76em;
-            color: #94a3b8;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        .quick-trainers-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-        }
+        .quick-trainers-title { font-size: 0.76em; color: #94a3b8; margin-bottom: 8px; font-weight: bold; }
+        .quick-trainers-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
         .trainer-chip-btn {
-            background: #334155;
-            color: #f8fafc;
-            border: 1px solid #475569;
-            padding: 4px 10px;
-            border-radius: 14px;
-            font-size: 0.78em;
-            font-weight: bold;
-            cursor: pointer;
+            background: #334155; color: #f8fafc; border: 1px solid #475569; padding: 4px 10px;
+            border-radius: 14px; font-size: 0.78em; font-weight: bold; cursor: pointer;
         }
-        .trainer-chip-btn:hover {
-            background: #0284c7;
-            border-color: #38bdf8;
-            color: white;
-        }
+        .trainer-chip-btn:hover { background: #0284c7; border-color: #38bdf8; color: white; }
 
         .login-input {
             width: 100%; padding: 12px 14px; margin-bottom: 12px; border: 1px solid #475569;
@@ -260,21 +319,10 @@
         #main-content { display: none; }
 
         .todo-user-reminder-banner {
-            display: none;
-            max-width: 1400px;
-            margin: 10px auto 0 auto;
-            padding: 10px 16px;
-            background: linear-gradient(90deg, #0284c7, #0369a1);
-            color: white;
-            border-radius: 8px;
-            font-size: 0.9em;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-            border: 1px solid #38bdf8;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            display: none; max-width: 1400px; margin: 10px auto 0 auto; padding: 10px 16px;
+            background: linear-gradient(90deg, #0284c7, #0369a1); color: white; border-radius: 8px;
+            font-size: 0.9em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            border: 1px solid #38bdf8; align-items: center; justify-content: space-between; gap: 10px;
             transition: transform 0.2s ease;
         }
         .todo-user-reminder-banner:hover { transform: translateY(-2px); }
@@ -284,25 +332,14 @@
         header h1 { margin: 0; font-size: 1.15em; font-weight: 700; display: flex; align-items: center; gap: 10px; justify-content: center; color: white; }
         
         .header-user-avatar {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-            background: #0284c7;
-            color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            font-weight: 800;
-            font-size: 0.95em;
-            cursor: pointer;
-            flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.25);
+            display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+            background: #0284c7; color: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-weight: 800; font-size: 0.95em; cursor: pointer; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.25);
         }
 
         .header-actions-left { display: flex; gap: 8px; align-items: center; }
-        .theme-toggle-btn, .logout-btn { background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.78em; font-weight: bold; }
-        .theme-toggle-btn:hover { background: #475569; }
+        .theme-toggle-btn, .logout-btn, .notify-toggle-btn { background: #334155; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.78em; font-weight: bold; }
+        .theme-toggle-btn:hover, .notify-toggle-btn:hover { background: #475569; }
         .logout-btn { background-color: #e74c3c; }
         .logout-btn:hover { background-color: #c0392b; }
 
@@ -322,63 +359,29 @@
         .dashboard-header h2 { margin: 0 0 4px 0; font-size: 1.3em; display: flex; align-items: center; gap: 8px; }
         .dashboard-header p { margin: 0; font-size: 0.85em; color: #64748b; }
 
-        .dashboard-kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+        .dashboard-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .kpi-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
             transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
         }
-        .kpi-card:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-        }
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
         .kpi-value { font-size: 1.9em; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
         .kpi-title { font-size: 0.85em; font-weight: 600; color: #64748b; }
 
-        .dashboard-main-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        @media (min-width: 900px) {
-            .dashboard-main-grid {
-                grid-template-columns: 1.1fr 0.9fr;
-            }
-        }
+        .dashboard-main-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
+        @media (min-width: 900px) { .dashboard-main-grid { grid-template-columns: 1.1fr 0.9fr; } }
 
-        .dashboard-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
+        .dashboard-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .dashboard-box-title {
-            margin: 0 0 15px 0;
-            font-size: 1.05em;
-            font-weight: 700;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin: 0 0 15px 0; font-size: 1.05em; font-weight: 700; border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
         }
 
         .stats-items-list { display: flex; flex-direction: column; gap: 12px; }
         .stat-item-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--main-bg); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color);
-            transition: transform 0.2s ease;
+            display: flex; justify-content: space-between; align-items: center; background: var(--main-bg);
+            padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); transition: transform 0.2s ease;
         }
         .stat-item-row:hover { transform: translateX(-3px); }
         .stat-item-label { font-size: 0.9em; font-weight: 600; }
@@ -387,8 +390,7 @@
         .badges-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
         .info-tag {
             background: rgba(2, 132, 199, 0.1); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.2);
-            padding: 3px 8px; border-radius: 12px; font-size: 0.78em; font-weight: bold;
-            transition: transform 0.2s ease;
+            padding: 3px 8px; border-radius: 12px; font-size: 0.78em; font-weight: bold; transition: transform 0.2s ease;
         }
         .info-tag:hover { transform: translateY(-1.5px); }
         body.dark-mode .info-tag { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
@@ -405,216 +407,66 @@
         .fault-row-item:hover { transform: translateX(-3px); }
         body.dark-mode .fault-row-item { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: #ef4444; }
 
-        .todo-container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        .todo-header-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .todo-header-box h2 {
-            margin: 0;
-            font-size: 1.4em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #0284c7;
-        }
+        .todo-container { max-width: 900px; margin: 0 auto; }
+        .todo-header-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .todo-header-box h2 { margin: 0; font-size: 1.4em; display: flex; align-items: center; gap: 10px; color: #0284c7; }
         body.dark-mode .todo-header-box h2 { color: #38bdf8; }
         .todo-add-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 14px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .todo-inputs-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .todo-inputs-row { display: flex; gap: 8px; flex-wrap: wrap; }
         .todo-input-title {
-            flex: 2;
-            min-width: 220px;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--input-bg);
-            color: var(--text-color);
-            font-size: 0.95em;
-            outline: none;
+            flex: 2; min-width: 220px; padding: 10px 14px; border: 1px solid var(--border-color);
+            border-radius: 8px; background: var(--input-bg); color: var(--text-color); font-size: 0.95em; outline: none;
         }
         .todo-input-title:focus { border-color: #0284c7; }
         .todo-select-assignee, .todo-input-date {
-            flex: 1;
-            min-width: 140px;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--input-bg);
-            color: var(--text-color);
-            font-size: 0.9em;
-            outline: none;
-            cursor: pointer;
+            flex: 1; min-width: 140px; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 8px; background: var(--input-bg); color: var(--text-color); font-size: 0.9em; outline: none; cursor: pointer;
         }
         .todo-add-btn {
-            background: #0284c7;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.95em;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            justify-content: center;
+            background: #0284c7; color: white; border: none; padding: 10px 18px; border-radius: 8px;
+            font-weight: bold; font-size: 0.95em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; justify-content: center;
         }
         .todo-add-btn:hover { background: #0369a1; }
 
-        .todo-list-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 25px;
-        }
+        .todo-list-wrap { display: flex; flex-direction: column; gap: 8px; margin-bottom: 25px; }
         .todo-item-card {
-            background: #ffffff;
-            color: #1e293b;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-            transition: background 0.2s, transform 0.2s ease, border-color 0.2s ease;
+            background: #ffffff; color: #1e293b; border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: background 0.2s, transform 0.2s ease, border-color 0.2s ease;
         }
-        body.dark-mode .todo-item-card {
-            background: #1e293b;
-            color: #f8fafc;
-            border-color: #334155;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
+        body.dark-mode .todo-item-card { background: #1e293b; color: #f8fafc; border-color: #334155; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
         .todo-item-card:hover { transform: translateY(-2px); }
         
-        .todo-item-card.starred {
-            background-color: #fef9c3 !important;
-            border-color: #facc15 !important;
-            color: #854d0e !important;
-        }
-        body.dark-mode .todo-item-card.starred {
-            background-color: rgba(234, 179, 8, 0.2) !important;
-            border-color: #ca8a04 !important;
-            color: #fef08a !important;
-        }
-        .todo-item-card.starred .todo-item-title {
-            color: #854d0e !important;
-        }
-        body.dark-mode .todo-item-card.starred .todo-item-title {
-            color: #fef08a !important;
-        }
+        .todo-item-card.starred { background-color: #fef9c3 !important; border-color: #facc15 !important; color: #854d0e !important; }
+        body.dark-mode .todo-item-card.starred { background-color: rgba(234, 179, 8, 0.2) !important; border-color: #ca8a04 !important; color: #fef08a !important; }
+        .todo-item-card.starred .todo-item-title { color: #854d0e !important; }
+        body.dark-mode .todo-item-card.starred .todo-item-title { color: #fef08a !important; }
 
-        .todo-item-card.completed {
-            opacity: 0.6;
-        }
-        .todo-item-card.completed .todo-item-title {
-            text-decoration: line-through;
-            color: #94a3b8 !important;
-        }
-        .todo-main-content {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-        }
+        .todo-item-card.completed { opacity: 0.6; }
+        .todo-item-card.completed .todo-item-title { text-decoration: line-through; color: #94a3b8 !important; }
+        .todo-main-content { display: flex; align-items: center; gap: 12px; flex: 1; }
         .todo-check-btn {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 2px solid #64748b;
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            padding: 0;
-            transition: 0.2s;
+            width: 22px; height: 22px; border-radius: 50%; border: 2px solid #64748b; background: transparent;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; transition: 0.2s;
         }
-        .todo-check-btn.checked {
-            background: #22c55e;
-            border-color: #22c55e;
-            color: white;
-        }
-        .todo-item-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .todo-item-title {
-            font-size: 0.98em;
-            font-weight: 600;
-        }
-        .todo-item-date {
-            font-size: 0.78em;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .todo-item-date.overdue {
-            color: #ef4444 !important;
-            font-weight: 800;
-        }
-        .todo-item-date.due-today {
-            color: #f59e0b !important;
-            font-weight: bold;
-        }
-        .todo-item-date.due-tomorrow {
-            color: #0284c7 !important;
-            font-weight: bold;
-        }
+        .todo-check-btn.checked { background: #22c55e; border-color: #22c55e; color: white; }
+        .todo-item-info { display: flex; flex-direction: column; gap: 2px; }
+        .todo-item-title { font-size: 0.98em; font-weight: 600; }
+        .todo-item-date { font-size: 0.78em; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
+        .todo-item-date.overdue { color: #ef4444 !important; font-weight: 800; }
+        .todo-item-date.due-today { color: #f59e0b !important; font-weight: bold; }
+        .todo-item-date.due-tomorrow { color: #0284c7 !important; font-weight: bold; }
         body.dark-mode .todo-item-date.due-tomorrow { color: #38bdf8 !important; }
 
-        .todo-actions-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .todo-actions-right { display: flex; align-items: center; gap: 8px; }
         .trainer-badge-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.78em;
-            flex-shrink: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            cursor: pointer;
+            width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 0.78em; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;
         }
-        .todo-star-btn, .todo-edit-btn, .todo-delete-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            font-size: 1.1em;
-            line-height: 1;
-        }
+        .todo-star-btn, .todo-edit-btn, .todo-delete-btn { background: none; border: none; cursor: pointer; padding: 4px; font-size: 1.1em; line-height: 1; }
         .todo-star-btn { color: #64748b; }
         .todo-star-btn.starred { color: #eab308; }
         .todo-edit-btn { color: #94a3b8; }
@@ -623,37 +475,15 @@
         .todo-delete-btn:hover { color: #ef4444; }
 
         .remove-extra-row-btn {
-            background: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #f87171;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-size: 0.72em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 3px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            line-height: 1.2;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: #fee2e2; color: #dc2626; border: 1px solid #f87171; border-radius: 12px;
+            padding: 2px 8px; font-size: 0.72em; font-weight: bold; cursor: pointer; margin-top: 3px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 2px; line-height: 1.2; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .remove-extra-row-btn:hover {
-            background: #ef4444 !important;
-            color: white !important;
-            border-color: #dc2626 !important;
-            transform: scale(1.05);
+            background: #ef4444 !important; color: white !important; border-color: #dc2626 !important; transform: scale(1.05);
         }
-        body.dark-mode .remove-extra-row-btn {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            border-color: #ef4444;
-        }
-        body.dark-mode .remove-extra-row-btn:hover {
-            background: #ef4444 !important;
-            color: white !important;
-        }
+        body.dark-mode .remove-extra-row-btn { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: #ef4444; }
+        body.dark-mode .remove-extra-row-btn:hover { background: #ef4444 !important; color: white !important; }
 
         .schedule-header-action {
             display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; background: var(--card-bg);
@@ -663,10 +493,9 @@
         .action-btns-group button { flex: 1; min-width: 220px; justify-content: center; }
         
         .wa-group-btn, .call-btn {
-            color: white; border: none; padding: 10px 14px;
-            border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.82em;
-            display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-decoration: none;
+            color: white; border: none; padding: 10px 14px; border-radius: 20px; font-weight: bold;
+            cursor: pointer; font-size: 0.82em; display: flex; align-items: center; justify-content: center; gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none;
         }
         .wa-group-btn { background-color: #128c7e; }
         .wa-group-btn:hover { background-color: #0e6f64; }
@@ -675,8 +504,8 @@
 
         .search-box { width: 100%; }
         .search-box input {
-            width: 100%; padding: 10px 14px; border: 2px solid var(--border-color);
-            border-radius: 25px; font-size: 0.95em; outline: none; transition: 0.3s; background: var(--input-bg); color: var(--text-color);
+            width: 100%; padding: 10px 14px; border: 2px solid var(--border-color); border-radius: 25px;
+            font-size: 0.95em; outline: none; transition: 0.3s; background: var(--input-bg); color: var(--text-color);
         }
         .search-box input:focus { border-color: #0284c7; }
 
@@ -695,13 +524,13 @@
         .spreadsheet-container { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; }
         .sheet-box { background: var(--main-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .sheet-side-header {
-            background-color: #1e293b; color: white; padding: 10px 14px;
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.95em; font-weight: bold; flex-wrap: wrap; gap: 8px;
+            background-color: #1e293b; color: white; padding: 10px 14px; display: flex; justify-content: space-between;
+            align-items: center; font-size: 0.95em; font-weight: bold; flex-wrap: wrap; gap: 8px;
         }
         .header-btns-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         .unit-wa-btn, .unit-add-btn {
-            color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.78em; font-weight: bold; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); white-space: nowrap;
+            color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.78em; font-weight: bold;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); white-space: nowrap;
         }
         .unit-wa-btn { background-color: #25d366; }
         .unit-wa-btn:hover { background-color: #20ba5a; }
@@ -714,7 +543,7 @@
         .status-table-container table { width: 100%; min-width: 600px; }
 
         .status-table-container th:nth-child(1), .status-table-container td:nth-child(1) { width: 110px; min-width: 110px; } 
-        .status-table-container th:nth-child(2), .status-table-container td:nth-child(2) { width: 90px; min-width: 90px; }   
+        .status-table-container th:nth-child(2), .status-table-container td:nth-child(2) { width: 90px; min-width: 90px; }    
         .status-table-container th:nth-child(3), .status-table-container td:nth-child(3) { width: 125px; min-width: 125px; } 
         .status-table-container th:nth-child(4), .status-table-container td:nth-child(4) { width: auto; }                    
 
@@ -764,9 +593,7 @@
             display: flex; gap: 6px; overflow-x: auto; padding: 14px 6px; margin-top: 20px;
             border-top: 2px solid var(--border-color); background: var(--card-bg); border-radius: 8px; justify-content: center; flex-wrap: wrap; align-items: flex-end;
         }
-        .month-folder-btn {
-            background-color: #475569; color: white; border: none; padding: 9px 16px; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: bold; font-size: 0.9em;
-        }
+        .month-folder-btn { background-color: #475569; color: white; border: none; padding: 9px 16px; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: bold; font-size: 0.9em; }
         .month-folder-btn:hover { background-color: #64748b; transform: translateY(-4px); }
         .month-folder-btn.active {
             background-color: #0284c7; color: #ffffff; transform: translateY(-6px) scale(1.08);
@@ -830,50 +657,24 @@
         .slide-img-box img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* ===== שיפורי נגישות לנייד - טבלאות וגלילה ===== */
-        .table-container,
-        .status-table-container {
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-            overscroll-behavior-x: contain;
-        }
+        .table-container, .status-table-container { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; overscroll-behavior-x: contain; }
 
         @media (max-width: 768px) {
             .spreadsheet-container .table-container table th:nth-child(1),
             .spreadsheet-container .table-container table td:nth-child(1) {
-                position: sticky;
-                right: 0;
-                z-index: 5;
-                background-color: var(--main-bg);
-                box-shadow: -4px 0 6px -2px rgba(0,0,0,0.15);
+                position: sticky; right: 0; z-index: 5; background-color: var(--main-bg); box-shadow: -4px 0 6px -2px rgba(0,0,0,0.15);
             }
-            .spreadsheet-container .table-container table th:nth-child(1) {
-                background-color: var(--th-bg);
-                z-index: 6;
-            }
-            body.dark-mode .spreadsheet-container .table-container table td:nth-child(1) {
-                background-color: var(--main-bg);
-            }
+            .spreadsheet-container .table-container table th:nth-child(1) { background-color: var(--th-bg); z-index: 6; }
+            body.dark-mode .spreadsheet-container .table-container table td:nth-child(1) { background-color: var(--main-bg); }
             
-            /* שמירה על צבעי הדגשה מיוחדים בעמודת התאריך הדביקה */
-            .today-row td:nth-child(1) {
-                background-color: #fef08a !important;
-            }
-            body.dark-mode .today-row td:nth-child(1) {
-                background-color: #713f12 !important;
-            }
-            .canceled-row td:nth-child(1) {
-                background-color: rgba(239, 68, 68, 0.25) !important;
-            }
-            body.dark-mode .canceled-row td:nth-child(1) {
-                background-color: rgba(239, 68, 68, 0.4) !important;
-            }
+            .today-row td:nth-child(1) { background-color: #fef08a !important; }
+            body.dark-mode .today-row td:nth-child(1) { background-color: #713f12 !important; }
+            .canceled-row td:nth-child(1) { background-color: rgba(239, 68, 68, 0.25) !important; }
+            body.dark-mode .canceled-row td:nth-child(1) { background-color: rgba(239, 68, 68, 0.4) !important; }
         }
 
         @media (max-width: 600px) {
-            .cell-input, .cell-select {
-                min-height: 34px;
-                font-size: 0.92em;
-            }
+            .cell-input, .cell-select { min-height: 34px; font-size: 0.92em; }
             table { font-size: 0.82em; }
             th, td { padding: 8px 4px; }
             main { padding: 10px 8px; }
@@ -881,6 +682,8 @@
     </style>
 </head>
 <body>
+
+    <div id="toastContainer"></div>
 
     <!-- מסך התחברות מהיר וידידותי -->
     <div id="auth-screen">
@@ -930,6 +733,7 @@
                     תפעול והדרכה - צוות גיל
                 </h1>
                 <div class="header-actions-left">
+                    <button class="notify-toggle-btn" onclick="requestNotificationPermission()">🔔 התראות</button>
                     <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()">🌙 מצב כהה</button>
                     <button class="logout-btn" onclick="logout()">התנתק 🚪</button>
                 </div>
@@ -977,7 +781,7 @@
                         <div class="sheet-side-header">
                             <span>ניידת 1 צפון</span>
                             <div class="header-btns-group">
-                                <button class="unit-add-btn" onclick="addExtraRow('north')" title="הוסף שורה נוספת לתאריך">➕ הוסף שורה</button>
+                                <button class="unit-add-btn" onclick="promptAddExtraRow('north')" title="הוסף שורה נוספת לתאריך">➕ הוסף שורה</button>
                                 <button class="unit-wa-btn" onclick="sendTomorrowReminder('north')">
                                     <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                                     שלח הודעה למתאמנים של מחר
@@ -1010,7 +814,7 @@
                         <div class="sheet-side-header">
                             <span>ניידת 2 מרכז/דרום</span>
                             <div class="header-btns-group">
-                                <button class="unit-add-btn" onclick="addExtraRow('south')" title="הוסף שורה נוספת לתאריך">➕ הוסף שורה</button>
+                                <button class="unit-add-btn" onclick="promptAddExtraRow('south')" title="הוסף שורה נוספת לתאריך">➕ הוסף שורה</button>
                                 <button class="unit-wa-btn" onclick="sendTomorrowReminder('south')">
                                     <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                                     שלח הודעה למתאמנים של מחר
@@ -1748,7 +1552,7 @@
         </div>
     </div>
 
-    <!-- מודאל אישור מחיקה מותאם אישית (מונע בעיות בדפדפני מובייל) -->
+    <!-- מודאל אישור מחיקה מותאם אישית -->
     <div id="customConfirmModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:100000; align-items:center; justify-content:center; padding:20px;">
         <div class="login-card" style="text-align:right; max-width:380px; width:100%; border:2px solid #ef4444;">
             <h3 style="margin-top:0; color:#ef4444; font-size:1.15em;">⚠️ אישור מחיקה</h3>
@@ -1788,7 +1592,11 @@
         let gorillaChartInstance = null;
         let latestStatusData = {};
         let latestTodosData = {};
-        let activeListeners = {};
+        let activeMonthRef = null;
+        let activeMonthCallback = null;
+        let activeDashboardRef = null;
+        let activeDashboardCallback = null;
+        let lastConflictsSignature = "";
 
         const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
@@ -1802,6 +1610,21 @@
             hours: new Set(["08:00 - 13:00", "09:00 - 14:00", "12:00 - 17:00", "08:30 - 15:30"]),
             notes: new Set(["אימון שגרתי תקין", "בוצע שיגור מוצלח", "תדרוך קצינים", "נדרש רענון למשגר", "טיפול חודשי"])
         };
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast-msg ${type}`;
+            toast.innerHTML = `<span>${type === 'error' ? '❌' : type === 'success' ? '✓' : type === 'warning' ? '⚠️' : 'ℹ️'}</span> ${escapeHtml(message)}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = '0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
 
         function escapeHtml(text) {
             if (!text) return "";
@@ -1886,32 +1709,37 @@
             initMonthFolders();
             initDashboardMonthTabs();
             loadMonthDataFromCloud(activeMonth);
+            loadDashboardMonthDataFromCloud(activeDashboardMonth);
             initCloudStatusSync();
             initCloudTodoSync();
         });
 
         function loadMonthDataFromCloud(monthIdx) {
-            if (activeListeners[monthIdx]) {
-                window.fbOff(window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`), 'value', activeListeners[monthIdx]);
+            if (activeMonthRef && activeMonthCallback) {
+                window.fbOff(activeMonthRef, 'value', activeMonthCallback);
             }
-            const sheetRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
-            const callback = (snapshot) => {
+            activeMonthRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            activeMonthCallback = (snapshot) => {
                 const saved = snapshot.val();
                 processLoadedMonthData(monthIdx, saved);
                 renderCurrentWeekTables();
                 renderDashboard(activeDashboardMonth);
+                checkScheduleConflicts();
             };
-            activeListeners[monthIdx] = callback;
-            window.fbOnValue(sheetRef, callback);
+            window.fbOnValue(activeMonthRef, activeMonthCallback);
         }
 
-        function loadMonthDataForDashboard(monthIdx) {
-            const tempRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
-            window.fbGet(tempRef).then((snapshot) => {
+        function loadDashboardMonthDataFromCloud(monthIdx) {
+            if (activeDashboardRef && activeDashboardCallback) {
+                window.fbOff(activeDashboardRef, 'value', activeDashboardCallback);
+            }
+            activeDashboardRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            activeDashboardCallback = (snapshot) => {
                 const saved = snapshot.val();
                 processDashboardMonthDataOnly(monthIdx, saved);
                 renderDashboard(activeDashboardMonth);
-            }).catch(console.error);
+            };
+            window.fbOnValue(activeDashboardRef, activeDashboardCallback);
         }
 
         function processDashboardMonthDataOnly(monthIdx, saved) {
@@ -1944,12 +1772,7 @@
                     }));
                 }
             }
-            if (!allMonthsDataCache[monthIdx]) {
-                allMonthsDataCache[monthIdx] = { north, south };
-            } else {
-                allMonthsDataCache[monthIdx].north = north;
-                allMonthsDataCache[monthIdx].south = south;
-            }
+            allMonthsDataCache[monthIdx] = { north, south };
         }
 
         function processLoadedMonthData(monthIdx, saved) {
@@ -2029,11 +1852,9 @@
         }
 
         function setupWeeksCache(monthIdx) {
-            for (let m = 0; m < 12; m++) {
-                const mData = getMonthDataCache(m);
-                if (mData && mData.north) mData.north.forEach(item => extractMemory(item.values));
-                if (mData && mData.south) mData.south.forEach(item => extractMemory(item.values));
-            }
+            const mData = getMonthDataCache(monthIdx);
+            if (mData && mData.north) mData.north.forEach(item => extractMemory(item.values));
+            if (mData && mData.south) mData.south.forEach(item => extractMemory(item.values));
 
             const prevSelectedWeekNum = (monthWeeksCache[activeWeekIndex]) ? monthWeeksCache[activeWeekIndex].weekNum : null;
 
@@ -2160,7 +1981,7 @@
                     document.querySelectorAll('#dashboardMonthTabs .month-folder-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     activeDashboardMonth = idx;
-                    loadMonthDataForDashboard(activeDashboardMonth);
+                    loadDashboardMonthDataFromCloud(activeDashboardMonth);
                 };
                 bar.appendChild(btn);
             });
@@ -2203,6 +2024,70 @@
                 btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;flex-shrink:0;"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg> שלח משמרות שבוע ${currentWeekObj.weekNum} לוואטסאפ`;
             }
         }
+
+        function checkScheduleConflicts() {
+            if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
+            const currentWeekObj = monthWeeksCache[activeWeekIndex];
+
+            let dayGuideMap = {};
+            let dayGorillaMap = {};
+
+            currentWeekObj.days.forEach(dayInfo => {
+                const monthData = getMonthDataCache(dayInfo.month);
+                const dayNum = dayInfo.day;
+
+                ['north', 'south'].forEach(side => {
+                    const rows = monthData[side].filter(item => item.dayNum === dayNum);
+                    rows.forEach(item => {
+                        const vals = item.values || [];
+                        const notes = vals[9] || '';
+                        if (notes.includes('בוטל') || notes.includes('התבטל')) return;
+
+                        const guides = [vals[1], vals[10]].filter(g => g && g.trim() !== "");
+                        const gorillas = [vals[7], vals[11]].filter(go => go && go.trim() !== "");
+
+                        guides.forEach(g => {
+                            let key = `${dayNum}_${g.trim()}`;
+                            dayGuideMap[key] = (dayGuideMap[key] || 0) + 1;
+                        });
+
+                        gorillas.forEach(go => {
+                            let key = `${dayNum}_${go.trim()}`;
+                            dayGorillaMap[key] = (dayGorillaMap[key] || 0) + 1;
+                        });
+                    });
+                });
+            });
+
+            let currentConflicts = [];
+            for (let key in dayGuideMap) {
+                if (dayGuideMap[key] > 1) {
+                    let [dNum, gName] = key.split('_');
+                    currentConflicts.push(`guide_${dNum}_${gName}`);
+                }
+            }
+            for (let key in dayGorillaMap) {
+                if (dayGorillaMap[key] > 1) {
+                    let [dNum, goName] = key.split('_');
+                    currentConflicts.push(`gorilla_${dNum}_${goName}`);
+                }
+            }
+
+            const signature = currentConflicts.sort().join('|');
+            if (signature !== lastConflictsSignature) {
+                lastConflictsSignature = signature;
+                currentConflicts.forEach(c => {
+                    let [type, dNum, name] = c.split('_');
+                    if (type === 'guide') {
+                        showToast(`⚠️ התנגשות מדריך: "${name}" משובץ בכמה מקומות ביום ${dNum}!`, "warning");
+                    } else {
+                        showToast(`⚠️ התנגשות גורילה: "${name}" משובצת בכמה מקומות ביום ${dNum}!`, "warning");
+                    }
+                });
+            }
+        }
+
+        const debouncedCheckConflicts = debounce(checkScheduleConflicts, 500);
 
         function renderCurrentWeekTables() {
             const northBody = document.getElementById('northTableBody');
@@ -2294,9 +2179,10 @@
             }
 
             filterSchedule();
+            checkScheduleConflicts();
         }
 
-        // ================= ניהול משימות To-Do והודעות לוואטסאפ =================
+        // ================= ניהול משימות To-Do והתראות דפדפן =================
         function initCloudTodoSync() {
             const todoRef = window.fbRef(window.fbDB, 'todos');
             window.fbOnValue(todoRef, (snapshot) => {
@@ -2304,7 +2190,53 @@
                 renderTodoList();
                 checkUserTodoReminders();
                 checkLoginTodoPopup();
+                triggerBrowserNotifications();
             });
+        }
+
+        window.requestNotificationPermission = function() {
+            if (!("Notification" in window)) {
+                showToast("הדפדפן שלך אינו תומך בהתראות דפדפן.", "error");
+                return;
+            }
+            Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                    showToast("התראות דפדפן הופעלו בהצלחה! ✓", "success");
+                    new Notification("צוות גיל - תפעול והדרכה", {
+                        body: "ההתראות הופעלו בהצלחה!",
+                        icon: "https://www.gstatic.com/images/icons/material/system/2x/notifications_active_black_48dp.png"
+                    });
+                } else {
+                    showToast("ההרשאה לשליחת התראות נדחתה.", "error");
+                }
+            });
+        };
+
+        function triggerBrowserNotifications() {
+            if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+            const trainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
+            if (!trainer || !trainer.firstName) return;
+
+            const todayStr = getLocalDateString(new Date());
+            const tasks = Object.keys(latestTodosData).map(k => ({ id: k, ...latestTodosData[k] }));
+
+            let notifiedMap = JSON.parse(sessionStorage.getItem('gorilla_notified_tasks') || '{}');
+
+            tasks.forEach(t => {
+                if (t.completed) return;
+                const isAssignedToMe = t.assignee && (t.assignee.includes(trainer.firstName) || (trainer.lastName && t.assignee.includes(trainer.lastName)));
+                if (!isAssignedToMe) return;
+
+                if (t.dueDate === todayStr && !notifiedMap[t.id]) {
+                    new Notification(`🚨 משימה דחופה להיום - צוות גיל`, {
+                        body: `שלום ${trainer.firstName}, יש לבצע היום: "${t.title}"`,
+                        icon: "https://www.gstatic.com/images/icons/material/system/2x/warning_amber_black_48dp.png"
+                    });
+                    notifiedMap[t.id] = true;
+                }
+            });
+            sessionStorage.setItem('gorilla_notified_tasks', JSON.stringify(notifiedMap));
         }
 
         function getTrainerInitials(name) {
@@ -2328,14 +2260,14 @@
             const cleanTarget = name.trim();
             for (let email in window.knownTrainers) {
                 const t = window.knownTrainers[email];
-                const fullName = `${t.firstName} ${t.lastName}`.trim();
+                const fullName = `${t.firstName} ${t.lastName || ''}`.trim();
                 if (fullName === cleanTarget || t.firstName === cleanTarget) {
                     return t.phone || "";
                 }
             }
             const currentTrainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
             if (currentTrainer && currentTrainer.phone) {
-                const currentFullName = `${currentTrainer.firstName} ${currentTrainer.lastName}`.trim();
+                const currentFullName = `${currentTrainer.firstName} ${currentTrainer.lastName || ''}`.trim();
                 if (currentFullName === cleanTarget || currentTrainer.firstName === cleanTarget) {
                     return currentTrainer.phone;
                 }
@@ -2513,25 +2445,40 @@
             window.fbSet(newTodoRef, newTodoData).then(() => {
                 if (titleInput) titleInput.value = "";
                 if (dateInput) dateInput.value = "";
-            }).catch(console.error);
+                showToast("המשימה נוצרה בהצלחה! ✓", "success");
+            }).catch(err => {
+                console.error(err);
+                showToast("שגיאה ביצירת המשימה", "error");
+            });
         };
 
         window.toggleTodoCompleted = function(id, currentStatus) {
             const updates = {};
             updates[`todos/${id}/completed`] = !currentStatus;
-            window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+            window.fbUpdate(window.fbRef(window.fbDB), updates).catch(err => {
+                console.error(err);
+                showToast("שגיאה בעדכון סטטוס משימה", "error");
+            });
         };
 
         window.toggleTodoStarred = function(id, currentStatus) {
             const updates = {};
             updates[`todos/${id}/starred`] = !currentStatus;
-            window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+            window.fbUpdate(window.fbRef(window.fbDB), updates).catch(err => {
+                console.error(err);
+                showToast("שגיאה בסימון משימה", "error");
+            });
         };
 
         window.deleteTodo = function(id) {
             showCustomConfirm("האם למחוק משימה זו?", () => {
                 const itemRef = window.fbRef(window.fbDB, `todos/${id}`);
-                window.fbRemove(itemRef).catch(console.error);
+                window.fbRemove(itemRef).then(() => {
+                    showToast("המשימה נמחקה בהצלחה", "success");
+                }).catch(err => {
+                    console.error(err);
+                    showToast("שגיאה במחיקת המשימה", "error");
+                });
             });
         };
 
@@ -2560,7 +2507,7 @@
             const dueDate = document.getElementById('editTodoDueDate').value;
 
             if (!id || !title) {
-                alert('נא להזין כותרת למשימה.');
+                showToast('נא להזין כותרת למשימה.', "error");
                 return;
             }
 
@@ -2571,7 +2518,11 @@
 
             window.fbUpdate(window.fbRef(window.fbDB), updates).then(() => {
                 closeEditTodoModal();
-            }).catch(console.error);
+                showToast("המשימה עודכנה בהצלחה! ✓", "success");
+            }).catch(err => {
+                console.error(err);
+                showToast("שגיאה בשמירת שינויים", "error");
+            });
         };
 
         function renderTodoList() {
@@ -2699,7 +2650,8 @@
 
                 let daysSince = 0;
                 if (row.cleaning) {
-                    const cleanDate = new Date(row.cleaning);
+                    const cleanParts = row.cleaning.split('-');
+                    const cleanDate = cleanParts.length === 3 ? new Date(cleanParts[0], cleanParts[1] - 1, cleanParts[2]) : new Date(row.cleaning);
                     const diffTime = today - cleanDate;
                     daysSince = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
                 } else {
@@ -2710,8 +2662,10 @@
 
             const kpiHealthy = document.getElementById('kpiHealthyGorillas');
             const kpiFaulty = document.getElementById('kpiFaultyGorillas');
+            const kpiTotalGorillas = document.getElementById('kpiTotalGorillas');
             if (kpiHealthy) kpiHealthy.innerText = healthyCount;
             if (kpiFaulty) kpiFaulty.innerText = faultyCount;
+            if (kpiTotalGorillas) kpiTotalGorillas.innerText = gorillaOptions.length - 1;
 
             const faultsContainer = document.getElementById('openFaultsContainer');
             const faultsBadge = document.getElementById('faultsCountBadge');
@@ -2894,7 +2848,7 @@
             });
         }
 
-        window.addExtraRow = function(side) {
+        window.promptAddExtraRow = function(side) {
             if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
             const currentWeekObj = monthWeeksCache[activeWeekIndex];
 
@@ -2905,35 +2859,22 @@
             });
 
             if (weekDaysOnly.length === 0) {
-                alert("אין ימי חול זמינים בשבוע זה.");
+                showToast("אין ימי חול זמינים בשבוע זה.", "error");
                 return;
             }
 
-            let promptMsg = "בחר תאריך מתוך ימי החול בשבוע הנוכחי להוספת שורה:\n\n";
-            weekDaysOnly.forEach((d, idx) => {
-                promptMsg += `${idx + 1}) יום ${d.hDayName} (${String(d.day).padStart(2, '0')}.${String(d.month + 1).padStart(2, '0')})\n`;
-            });
-            promptMsg += "\nהקלד את מספר היום ברשימה (1-5) או את תאריך היום בחודש:";
+            let daysText = weekDaysOnly.map((d, idx) => `${idx + 1}) יום ${d.hDayName} (${String(d.day).padStart(2, '0')}.${String(d.month + 1).padStart(2, '0')})`).join('\n');
+            
+            let choice = prompt(`בחר תאריך מתוך ימי החול בשבוע הנוכחי להוספת שורה:\n\n${daysText}\n\nהקלד מספר (1-${weekDaysOnly.length}):`, "1");
+            if (!choice) return;
 
-            let input = prompt(promptMsg);
-            if (!input) return;
-            input = input.trim();
-
-            let targetDayInfo = null;
-            let choiceIndex = parseInt(input);
-
-            if (!isNaN(choiceIndex) && choiceIndex >= 1 && choiceIndex <= weekDaysOnly.length) {
-                targetDayInfo = weekDaysOnly[choiceIndex - 1];
-            } else {
-                let dayNumInput = parseInt(input.split('.')[0]);
-                targetDayInfo = weekDaysOnly.find(d => d.day === dayNumInput);
-            }
-
-            if (!targetDayInfo) {
-                alert("תאריך לא תקין, נבחר יום בסוף שבוע, או שהיום אינו מופיע בשבוע זה.");
+            let choiceIdx = parseInt(choice.trim()) - 1;
+            if (isNaN(choiceIdx) || choiceIdx < 0 || choiceIdx >= weekDaysOnly.length) {
+                showToast("בחירה לא תקינה", "error");
                 return;
             }
 
+            let targetDayInfo = weekDaysOnly[choiceIdx];
             let dayNum = targetDayInfo.day;
             let targetMonthIdx = targetDayInfo.month;
 
@@ -2941,7 +2882,7 @@
             const dateStr = `${String(dayNum).padStart(2, '0')}.${String(targetMonthIdx + 1).padStart(2, '0')}`;
             const dateObj = new Date(currentYear, targetMonthIdx, dayNum);
             const hDayName = hebrewDaysShort[dateObj.getDay()];
-            const defGuide = side === 'north' ? "איתי הקר" : "עדיאל קסה";
+            const defGuide = ""; // השארת שדה ריק לבחירה ידנית
             const newValues = [`${dateStr} ${hDayName}`, defGuide, "", "", "", "", "", "", "", "", "", "", ""];
 
             const newRow = {
@@ -2963,6 +2904,7 @@
             saveSideArrayToCloud(side, targetMonthIdx);
             renderCurrentWeekTables();
             renderDashboard(activeDashboardMonth);
+            showToast("השורה נוספה בהצלחה! ✓", "success");
         };
 
         function showCustomConfirm(message, onConfirm) {
@@ -2996,15 +2938,13 @@
                 if (!monthData || !monthData[side]) return;
 
                 const idx = monthData[side].findIndex(r => r.id === rowId);
-                if (idx === -1) {
-                    console.error("Row not found for deletion", rowId);
-                    return;
-                }
+                if (idx === -1) return;
 
                 monthData[side].splice(idx, 1);
                 renderCurrentWeekTables();
                 renderDashboard(activeDashboardMonth);
                 saveSideArrayToCloud(side, monthIdx);
+                showToast("השורה נמחקה בהצלחה", "success");
             });
         };
 
@@ -3014,8 +2954,8 @@
             const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[10]) {
-                    rowData.values[10] = guidesOptions[1] || "";
-                    updateCacheAndSaveById(side, monthIdx, rowId, 10, rowData.values[10]);
+                    rowData.values[10] = ""; // ברירת מחדל ריקה
+                    updateCacheAndSaveById(side, monthIdx, rowId, 10, "");
                 }
             }
             renderCurrentWeekTables();
@@ -3032,8 +2972,8 @@
             const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[11]) {
-                    rowData.values[11] = gorillaOptions[1] || "גורילה 1";
-                    updateCacheAndSaveById(side, monthIdx, rowId, 11, rowData.values[11]);
+                    rowData.values[11] = ""; // ברירת מחדל ריקה
+                    updateCacheAndSaveById(side, monthIdx, rowId, 11, "");
                 }
             }
             renderCurrentWeekTables();
@@ -3077,22 +3017,13 @@
                         row.hasUserModifiedGuide2 = true;
                         updates[`sheets/${currentYear}_${monthIdx}/south/${cacheIndex}/hasUserModifiedGuide2`] = true;
                     }
-
-                    if (window.trainerGorillaMap[val]) {
-                        const defaults = window.trainerGorillaMap[val];
-                        if (!row.values[7]) {
-                            row.values[7] = defaults[0];
-                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/7`] = defaults[0];
-                        }
-                        if (defaults[1] && !row.values[11]) {
-                            row.values[11] = defaults[1];
-                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/11`] = defaults[1];
-                        }
-                    }
                 }
 
                 try {
-                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(err => {
+                        console.error(err);
+                        showToast("שגיאה בסנכרון לענן", "error");
+                    });
                 } catch (err) {
                     console.error("Failed fbUpdate:", err);
                 }
@@ -3205,11 +3136,6 @@
 
         window.handleNotesChangeById = function(side, monthIdx, rowId, value) {
             updateCacheAndSaveById(side, monthIdx, rowId, 9, value);
-            
-            if (value && value.trim().includes("טיפול חודשי")) {
-                updateCacheAndSaveById(side, monthIdx, rowId, 2, "טיפול חודשי");
-            }
-            
             renderCurrentWeekTables();
             renderDashboard(activeDashboardMonth);
         };
@@ -3238,7 +3164,10 @@
                 }
 
                 try {
-                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(console.error);
+                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(err => {
+                        console.error(err);
+                        showToast("שגיאה בשמירת השינוי בענן", "error");
+                    });
                 } catch (err) {
                     console.error("Failed fbUpdate:", err);
                 }
@@ -3246,6 +3175,7 @@
                 extractMemory(targetRow.values);
                 rebuildDatalists();
                 renderDashboard(activeDashboardMonth);
+                debouncedCheckConflicts();
             }
         };
 
@@ -3269,7 +3199,10 @@
 
             const sideRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}/${side}`);
             try {
-                window.fbSet(sideRef, cleanArray).catch(console.error);
+                window.fbSet(sideRef, cleanArray).catch(err => {
+                    console.error(err);
+                    showToast("שגיאה בשמירת הגיליון לענן", "error");
+                });
             } catch (err) {
                 console.error("Failed to save (validation error):", err);
             }
@@ -3336,7 +3269,10 @@
             });
             latestStatusData = statusesData;
             const statusRef = window.fbRef(window.fbDB, 'gorilla_statuses');
-            window.fbSet(statusRef, statusesData);
+            window.fbSet(statusRef, statusesData).catch(err => {
+                console.error(err);
+                showToast("שגיאה בשמירת סטטוס גורילות", "error");
+            });
             renderDashboard(activeDashboardMonth);
         };
 
@@ -3367,22 +3303,15 @@
             
             if (currentUser && currentUser.email) {
                 const emailKey = currentUser.email.toLowerCase();
+                let directoryInfo = window.knownTrainers[emailKey];
+                
                 if (!trainer || trainer.email !== currentUser.email) {
-                    if (window.knownTrainers && window.knownTrainers[emailKey]) {
-                        trainer = {
-                            firstName: window.knownTrainers[emailKey].firstName,
-                            lastName: window.knownTrainers[emailKey].lastName,
-                            email: currentUser.email,
-                            phone: window.knownTrainers[emailKey].phone || ""
-                        };
-                    } else {
-                        trainer = {
-                            firstName: currentUser.email.split('@')[0],
-                            lastName: "",
-                            email: currentUser.email,
-                            phone: ""
-                        };
-                    }
+                    trainer = {
+                        firstName: directoryInfo ? directoryInfo.firstName : currentUser.email.split('@')[0],
+                        lastName: directoryInfo ? directoryInfo.lastName : "",
+                        email: currentUser.email,
+                        phone: directoryInfo ? directoryInfo.phone : ""
+                    };
                     localStorage.setItem('gorilla_trainer_profile', JSON.stringify(trainer));
                 }
             }
@@ -3414,7 +3343,7 @@
             if (phone === null) return;
             
             if (!fName.trim()) {
-                alert("נא להזין שם פרטי לפחות.");
+                showToast("נא להזין שם פרטי לפחות.", "error");
                 return;
             }
 
@@ -3424,13 +3353,13 @@
             
             localStorage.setItem('gorilla_trainer_profile', JSON.stringify(trainer));
             window.initTrainerProfile();
-            alert("הפרטים עודכנו בהצלחה! ✓");
+            showToast("הפרטים עודכנו בהצלחה! ✓", "success");
         };
 
         window.exportWeeklyShiftsToCalendar = function() {
             const trainer = JSON.parse(localStorage.getItem('gorilla_trainer_profile') || 'null');
             if (!trainer) {
-                alert('אנא הגדר את פרטי המדריך שלך (לחיצה על האוואטר בראש העמוד) לפני שליחת המשמרות.');
+                showToast('אנא הגדר את פרטי המדריך שלך לפני שליחת המשמרות.', "error");
                 return;
             }
 
@@ -3461,7 +3390,7 @@
             });
 
             if (trainerShifts.length === 0) {
-                alert(`לא נמצאו משמרות הרשומות על שם "${trainer.firstName}" בשבוע ${targetWeekObj.weekNum}.`);
+                showToast(`לא נמצאו משמרות הרשומות על שם "${trainer.firstName}" בשבוע ${targetWeekObj.weekNum}.`, "error");
                 return;
             }
 
@@ -3489,7 +3418,7 @@
             
             const rows = monthData[side].filter(item => item.dayNum === dNum);
             if (!rows || rows.length === 0) {
-                alert("לא נמצאו נתונים למחר.");
+                showToast("לא נמצאו נתונים למחר.", "error");
                 return;
             }
 
@@ -3499,7 +3428,7 @@
             });
 
             if (activeRows.length === 0) {
-                alert("כל האימונים המיועדים למחר מבוטלים.");
+                showToast("כל האימונים המיועדים למחר מבוטלים.", "error");
                 return;
             }
 
@@ -3681,7 +3610,7 @@
                 }
             });
 
-            if (count === 0) { alert(`לא נמצאו נתונים פעילים בשבוע ${currentWeekObj.weekNum}.`); return; }
+            if (count === 0) { showToast(`לא נמצאו נתונים פעילים בשבוע ${currentWeekObj.weekNum}.`, "error"); return; }
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
@@ -3706,7 +3635,7 @@
                 document.execCommand('copy');
                 showCopiedFeedback(btnElement);
             } catch (err) {
-                alert('שגיאה בהעתקת הקישור');
+                showToast('שגיאה בהעתקת הקישור', "error");
             }
             document.body.removeChild(textArea);
         }

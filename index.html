@@ -178,7 +178,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v12';
+                    const CACHE_NAME = 'gorilla-ops-v13';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1503,6 +1503,7 @@
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">הצתת מנוע ראשי</td>
                                     <td style="padding: 8px;">ניצת רק לאחר 3.5 מטרים (להגנת המפעיל)</td>
+                                    
                                 </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">רשף לאחור</td>
@@ -1589,6 +1590,7 @@
         let activeMonth = new Date().getMonth(); 
         let activeDashboardMonth = new Date().getMonth(); 
         let activeWeekIndex = 0; 
+        let activeWeekNum = null; // משתנה נעילה לשבוע הנבחר שלא יזוז
         let gorillaChartInstance = null;
         let latestStatusData = {};
         let latestTodosData = {};
@@ -1854,8 +1856,6 @@
             if (mData && mData.north) mData.north.forEach(item => extractMemory(item.values));
             if (mData && mData.south) mData.south.forEach(item => extractMemory(item.values));
 
-            const prevSelectedWeekNum = (monthWeeksCache[activeWeekIndex]) ? monthWeeksCache[activeWeekIndex].weekNum : null;
-
             const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
             const weeksMap = new Map();
 
@@ -1902,16 +1902,22 @@
                 );
             }
 
-            if (prevSelectedWeekNum !== null && !isInitialWeekLoad) {
-                const foundPrevIndex = monthWeeksCache.findIndex(w => w.weekNum === prevSelectedWeekNum);
-                if (foundPrevIndex !== -1) {
-                    activeWeekIndex = foundPrevIndex;
+            // נעילת השבוע הנבחר המדויק לפי מספר שבוע (activeWeekNum) כך שלא יקפוץ לעולם
+            if (activeWeekNum !== null) {
+                const foundIndex = monthWeeksCache.findIndex(w => w.weekNum === activeWeekNum);
+                if (foundIndex !== -1) {
+                    activeWeekIndex = foundIndex;
+                } else if (activeWeekIndex >= monthWeeksCache.length) {
+                    activeWeekIndex = 0;
                 }
             } else if (isInitialWeekLoad) {
                 if (foundTodayIndex !== -1) {
                     activeWeekIndex = foundTodayIndex;
                 } else if (activeWeekIndex >= monthWeeksCache.length) {
                     activeWeekIndex = 0;
+                }
+                if (monthWeeksCache[activeWeekIndex]) {
+                    activeWeekNum = monthWeeksCache[activeWeekIndex].weekNum;
                 }
             }
 
@@ -1960,6 +1966,7 @@
                     btn.classList.add('active');
                     activeMonth = idx;
                     activeWeekIndex = 0;
+                    activeWeekNum = null; // איפוס נעילת שבוע במעבר חודש
                     isInitialWeekLoad = true;
                     loadMonthData(activeMonth);
                 };
@@ -2007,6 +2014,7 @@
                     document.querySelectorAll('.week-tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     activeWeekIndex = idx;
+                    activeWeekNum = weekObj.weekNum; // נעילת השבוע הנבחר המדויק
                     renderCurrentWeekTables();
                 };
                 bar.appendChild(btn);

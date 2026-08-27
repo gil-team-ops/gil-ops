@@ -6,7 +6,7 @@
     <title>תפעול והדרכה - צוות גיל</title>
     
     <!-- PWA Manifest עם אייקונים מלאים ותקניים -->
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D7%AA%D7%A4%D7%A2%D7%95%D7%9C%20%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94%20-%20%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22short_name%22%3A%22%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%231a252f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0iIzAyODRjNyIvPjxwZXRoIGQ9Ik0xNTYgMjU2bCA4MCA4MCAxMzItMTMyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D7%AA%D7%A4%D7%A2%D7%95%D7%9C%20%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94%20-%20%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22short_name%22%3A%22%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%231a252f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxnpmjs0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0iIzAyODRjNyIvPjxwZXRoIGQ9Ik0xNTYgMjU2bCA4MCA4MCAxMzItMTMyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aッドD0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
     <meta name="theme-color" content="#1a252f">
 
     <!-- Chart.js לסרגל נתונים ודשבורד אינטראקטיבי -->
@@ -55,7 +55,6 @@
 
         window.knownTrainers = {};
 
-        // טעינה אסינכרונית ואמינה של ספריית המדריכים מתוך Firebase
         async function loadKnownTrainers() {
             try {
                 const trainersRef = ref(db, 'trainers_directory');
@@ -73,7 +72,6 @@
                     "antonicbc@gmail.com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
                 };
 
-                // אם אין עדיין נתונים בענן, נטען את ברירת המחדל עם המספרים החדשים
                 if (!data) {
                     await set(trainersRef, defaultDir);
                     window.knownTrainers = {};
@@ -180,7 +178,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v4';
+                    const CACHE_NAME = 'gorilla-ops-v6';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1599,6 +1597,7 @@
         let activeDashboardRef = null;
         let activeDashboardCallback = null;
         let lastConflictsSignature = "";
+        let isInitialWeekLoad = true;
 
         const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
@@ -1720,6 +1719,7 @@
             if (activeMonthRef && activeMonthCallback) {
                 window.fbOff(activeMonthRef, 'value', activeMonthCallback);
             }
+            isInitialWeekLoad = true;
             activeMonthRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
             activeMonthCallback = (snapshot) => {
                 const saved = snapshot.val();
@@ -1906,14 +1906,10 @@
                 );
             }
 
-            if (prevSelectedWeekNum !== null) {
+            if (prevSelectedWeekNum !== null && !isInitialWeekLoad) {
                 const foundPrevIndex = monthWeeksCache.findIndex(w => w.weekNum === prevSelectedWeekNum);
                 if (foundPrevIndex !== -1) {
                     activeWeekIndex = foundPrevIndex;
-                } else if (foundTodayIndex !== -1) {
-                    activeWeekIndex = foundTodayIndex;
-                } else {
-                    activeWeekIndex = 0;
                 }
             } else if (foundTodayIndex !== -1) {
                 activeWeekIndex = foundTodayIndex;
@@ -1921,6 +1917,7 @@
                 activeWeekIndex = 0;
             }
 
+            isInitialWeekLoad = false;
             rebuildDatalists();
             initWeekTabs();
         }
@@ -3018,6 +3015,19 @@
                     } else {
                         row.hasUserModifiedGuide2 = true;
                         updates[`sheets/${currentYear}_${monthIdx}/south/${cacheIndex}/hasUserModifiedGuide2`] = true;
+                    }
+
+                    // תיקון הבאג: מילוי אוטומטי של עמודת הגורילה לפי הנבחר (איתי / עדיאל)
+                    if (window.trainerGorillaMap[val]) {
+                        const defaults = window.trainerGorillaMap[val];
+                        if (defaults[0] && !row.values[7]) {
+                            row.values[7] = defaults[0];
+                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/7`] = defaults[0];
+                        }
+                        if (defaults[1] && !row.values[11]) {
+                            row.values[11] = defaults[1];
+                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/11`] = defaults[1];
+                        }
                     }
                 }
 

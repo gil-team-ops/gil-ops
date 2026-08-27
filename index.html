@@ -178,7 +178,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v10';
+                    const CACHE_NAME = 'gorilla-ops-v12';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1287,23 +1287,24 @@
 
                 <h3 class="table-title">יום מס' 5 - חניכת אימון ומבחנים: תרגול, תקלות ומבחן עיוני</h3>
                 <div class="table-container">
-                    <thead>
-                        <tr><th>נושא נלמד</th><th>חופף</th><th>תוכן והנחיות</th><th>קישור ישיר</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>תרגול הרמת מערכות ותקלות</td><td>מנהל אתר</td>
-                            <td>תרגול מעשי של החניך בליווי מנהל האתר, מעבר על מצגת תקלות.</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>מבחן עיוני</td><td>מנהל אתר</td>
-                            <td>ביצוע מבחן עיוני כתוב.</td>
-                            <td><a href="https://msbagiraadmoutlook.sharepoint.com/:w:/g/Operations/Infantry_Department/IQCucOPovSqGT7PZLCqrMj93AZdmLZ17258Uo9X2NqYvnE0?e=Wwm1lj" target="_blank" class="link-table-btn" style="background-color: #2ecc71;">✍️ פתח מבחן עיוני 🔗</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                    <table>
+                        <thead>
+                            <tr><th>נושא נלמד</th><th>חופף</th><th>תוכן והנחיות</th><th>קישור ישיר</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>תרגול הרמת מערכות ותקלות</td><td>מנהל אתר</td>
+                                <td>תרגול מעשי של החניך בליווי מנהל האתר, מעבר על מצגת תקלות.</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>מבחן עיוני</td><td>מנהל אתר</td>
+                                <td>ביצוע מבחן עיוני כתוב.</td>
+                                <td><a href="https://msbagiraadmoutlook.sharepoint.com/:w:/g/Operations/Infantry_Department/IQCucOPovSqGT7PZLCqrMj93AZdmLZ17258Uo9X2NqYvnE0?e=Wwm1lj" target="_blank" class="link-table-btn" style="background-color: #2ecc71;">✍️ פתח מבחן עיוני 🔗</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <h3 class="table-title">יום מס' 6 - ניהול אתר ומבחן מעשי: ניהול אתר מלא, נהלים ומבחן מעשי</h3>
                 <div class="table-container">
@@ -2090,6 +2091,7 @@
             const northBody = document.getElementById('northTableBody');
             const southBody = document.getElementById('southTableBody');
             if (!northBody || !southBody) return;
+            if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
 
             const activeEl = document.activeElement;
             const activeId = activeEl && activeEl.id ? activeEl.id : null;
@@ -2099,7 +2101,6 @@
             northBody.innerHTML = '';
             southBody.innerHTML = '';
 
-            if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
             const currentWeekObj = monthWeeksCache[activeWeekIndex];
 
             updateActionButtonsText();
@@ -3024,7 +3025,6 @@
                     }
                 }
 
-                // כתיבה בטוחה של כל השורה לענן כדי למנוע חורים במערך
                 const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
                 window.fbSet(window.fbRef(window.fbDB, rowPath), {
                     id: row.id,
@@ -3164,7 +3164,6 @@
                     else targetRow.hasUserModifiedGuide2 = true;
                 }
 
-                // תיקון שורש הבעיה: כתיבה של אובייקט שורה מלא (ללא חורים במערך)
                 const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
                 window.fbSet(window.fbRef(window.fbDB, rowPath), {
                     id: targetRow.id,

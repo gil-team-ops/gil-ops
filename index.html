@@ -178,7 +178,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v13';
+                    const CACHE_NAME = 'gorilla-ops-v14';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1503,7 +1503,6 @@
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">הצתת מנוע ראשי</td>
                                     <td style="padding: 8px;">ניצת רק לאחר 3.5 מטרים (להגנת המפעיל)</td>
-                                    
                                 </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">רשף לאחור</td>
@@ -1590,7 +1589,7 @@
         let activeMonth = new Date().getMonth(); 
         let activeDashboardMonth = new Date().getMonth(); 
         let activeWeekIndex = 0; 
-        let activeWeekNum = null; // משתנה נעילה לשבוע הנבחר שלא יזוז
+        let activeWeekNum = null; // נעילת השבוע הנבחר המדויק
         let gorillaChartInstance = null;
         let latestStatusData = {};
         let latestTodosData = {};
@@ -1600,6 +1599,7 @@
         let activeDashboardCallback = null;
         let lastConflictsSignature = "";
         let isInitialWeekLoad = true;
+        let monthFetchInFlight = {};
 
         const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
@@ -1746,36 +1746,16 @@
         }
 
         function processDashboardMonthDataOnly(monthIdx, saved) {
-            const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
-            let north = [];
-            let south = [];
-            for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
-                const dateObj = new Date(currentYear, monthIdx, dayNum);
-                const dayOfWeek = dateObj.getDay(); 
-                if (dayOfWeek === 5 || dayOfWeek === 6) continue;
-                const hDayName = hebrewDaysShort[dayOfWeek];
-                north.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] });
-                south.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] });
-            }
-            if (saved) {
-                const northRaw = saved.north ? (Array.isArray(saved.north) ? saved.north : Object.values(saved.north)) : [];
-                north = northRaw.filter(Boolean).map(item => ({
-                    id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
-                    dayNum: item.dayNum,
-                    values: normalizeRowValues(item.values)
-                }));
-
-                const southRaw = saved.south ? (Array.isArray(saved.south) ? saved.south : Object.values(saved.south)) : [];
-                south = southRaw.filter(Boolean).map(item => ({
-                    id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
-                    dayNum: item.dayNum,
-                    values: normalizeRowValues(item.values)
-                }));
-            }
-            allMonthsDataCache[monthIdx] = { north, south };
+            allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, saved, false);
         }
 
         function processLoadedMonthData(monthIdx, saved) {
+            allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, saved, true);
+            setupWeeksCache(monthIdx);
+        }
+
+        // פונקציית בניית חודש נקייה המפרידה בין שליפה רגילה לעדכון state גלובלי
+        function buildMonthDataFromSaved(monthIdx, saved, isDefaultGuideActive = true) {
             const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
             let north = [];
             let south = [];
@@ -1785,8 +1765,8 @@
                 if (dayOfWeek === 5 || dayOfWeek === 6) continue;
 
                 const hDayName = hebrewDaysShort[dayOfWeek];
-                let defaultGuideNorth = "איתי הקר";
-                let defaultGuideSouth = "עדיאל קסה";
+                let defaultGuideNorth = isDefaultGuideActive ? "איתי הקר" : "";
+                let defaultGuideSouth = isDefaultGuideActive ? "עדיאל קסה" : "";
 
                 north.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", defaultGuideNorth, "", "", "", "", "", "", "", "", "", "", ""] });
                 south.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", defaultGuideSouth, "", "", "", "", "", "", "", "", "", "", ""] });
@@ -1801,7 +1781,7 @@
                         return dow !== 5 && dow !== 6;
                     }).map(item => {
                         const dateObj = new Date(currentYear, monthIdx, item.dayNum);
-                        let defaultGuideNorth = "איתי הקר";
+                        let defaultGuideNorth = isDefaultGuideActive ? "איתי הקר" : "";
                         let currentVals = normalizeRowValues(item.values);
                         if (!currentVals[1] && !item.hasUserModifiedGuide1) {
                             currentVals[1] = defaultGuideNorth;
@@ -1824,7 +1804,7 @@
                         return dow !== 5 && dow !== 6;
                     }).map(item => {
                         const dateObj = new Date(currentYear, monthIdx, item.dayNum);
-                        let defaultGuideSouth = "עדיאל קסה";
+                        let defaultGuideSouth = isDefaultGuideActive ? "עדיאל קסה" : "";
                         let currentVals = normalizeRowValues(item.values);
                         if (!currentVals[1] && !item.hasUserModifiedGuide2) {
                             currentVals[1] = defaultGuideSouth;
@@ -1840,13 +1820,25 @@
                     });
                 }
             }
-            allMonthsDataCache[monthIdx] = { north, south };
-            setupWeeksCache(monthIdx);
+            return { north, south };
+        }
+
+        // שליפה אסינכרונית חד-פעמית של חודש שכן מבלי לדרוס את ה-state של השבועות
+        function fetchNeighborMonthOnce(monthIdx) {
+            if (monthFetchInFlight[monthIdx]) return;
+            monthFetchInFlight[monthIdx] = true;
+            const monthRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            window.fbGet(monthRef).then(snapshot => {
+                allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, snapshot.val(), true);
+                renderCurrentWeekTables();
+                renderDashboard(activeDashboardMonth);
+            }).catch(console.error);
         }
 
         function getMonthDataCache(monthIdx) {
             if (!allMonthsDataCache[monthIdx]) {
-                processLoadedMonthData(monthIdx, null);
+                allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, null, false);
+                fetchNeighborMonthOnce(monthIdx);
             }
             return allMonthsDataCache[monthIdx];
         }
@@ -1902,7 +1894,6 @@
                 );
             }
 
-            // נעילת השבוע הנבחר המדויק לפי מספר שבוע (activeWeekNum) כך שלא יקפוץ לעולם
             if (activeWeekNum !== null) {
                 const foundIndex = monthWeeksCache.findIndex(w => w.weekNum === activeWeekNum);
                 if (foundIndex !== -1) {
@@ -1966,7 +1957,7 @@
                     btn.classList.add('active');
                     activeMonth = idx;
                     activeWeekIndex = 0;
-                    activeWeekNum = null; // איפוס נעילת שבוע במעבר חודש
+                    activeWeekNum = null;
                     isInitialWeekLoad = true;
                     loadMonthData(activeMonth);
                 };
@@ -2014,7 +2005,7 @@
                     document.querySelectorAll('.week-tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     activeWeekIndex = idx;
-                    activeWeekNum = weekObj.weekNum; // נעילת השבוע הנבחר המדויק
+                    activeWeekNum = weekObj.weekNum;
                     renderCurrentWeekTables();
                 };
                 bar.appendChild(btn);

@@ -62,14 +62,14 @@
                 const data = snapshot.val();
                 
                 const defaultDir = {
-                    "itayhaker19@gmail.com": { firstName: "איתי", lastName: "הקר", phone: "0508532002", email: "itayhaker19@gmail.com" },
-                    "adielkassa@gmail.com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209", email: "adielkassa@gmail.com" },
-                    "reemkayzer@gmail.com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231", email: "reemkayzer@gmail.com" },
-                    "nadavyichye@gmail.com": { firstName: "נדב", lastName: "יחיא", phone: "0528686796", email: "nadavyichye@gmail.com" },
-                    "idolevko2@gmail.com": { firstName: "עידו", lastName: "לבקוביץ", phone: "0522988181", email: "idolevko2@gmail.com" },
-                    "tomerk2001@gmail.com": { firstName: "תומר", lastName: "כחלון", phone: "0586222992", email: "tomerk2001@gmail.com" },
-                    "netashatzberg@gmail.com": { firstName: "נטע", lastName: "שצברג", phone: "0586140806", email: "netashatzberg@gmail.com" },
-                    "antonicbc@gmail.com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
+                    "itayhaker19_gmail_com": { firstName: "איתי", lastName: "הקר", phone: "0508532002", email: "itayhaker19@gmail.com" },
+                    "adielkassa_gmail_com": { firstName: "עדיאל", lastName: "קסה", phone: "0526652209", email: "adielkassa@gmail.com" },
+                    "reemkayzer_gmail_com": { firstName: "ראם", lastName: "קייזר", phone: "0508922231", email: "reemkayzer@gmail.com" },
+                    "nadavyichye_gmail_com": { firstName: "נדב", lastName: "יחיא", phone: "0528686796", email: "nadavyichye@gmail.com" },
+                    "idolevko2_gmail_com": { firstName: "עידו", lastName: "לבקוביץ", phone: "0522988181", email: "idolevko2@gmail.com" },
+                    "tomerk2001_gmail_com": { firstName: "תומר", lastName: "כחלון", phone: "0586222992", email: "tomerk2001@gmail.com" },
+                    "netashatzberg_gmail_com": { firstName: "נטע", lastName: "שצברג", phone: "0586140806", email: "netashatzberg@gmail.com" },
+                    "antonicbc_gmail_com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
                 };
 
                 if (!data) {
@@ -178,7 +178,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v9';
+                    const CACHE_NAME = 'gorilla-ops-v10';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1287,24 +1287,23 @@
 
                 <h3 class="table-title">יום מס' 5 - חניכת אימון ומבחנים: תרגול, תקלות ומבחן עיוני</h3>
                 <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr><th>נושא נלמד</th><th>חופף</th><th>תוכן והנחיות</th><th>קישור ישיר</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>תרגול הרמת מערכות ותקלות</td><td>מנהל אתר</td>
-                                <td>תרגול מעשי של החניך בליווי מנהל האתר, מעבר על מצגת תקלות.</td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>מבחן עיוני</td><td>מנהל אתר</td>
-                                <td>ביצוע מבחן עיוני כתוב.</td>
-                                <td><a href="https://msbagiraadmoutlook.sharepoint.com/:w:/g/Operations/Infantry_Department/IQCucOPovSqGT7PZLCqrMj93AZdmLZ17258Uo9X2NqYvnE0?e=Wwm1lj" target="_blank" class="link-table-btn" style="background-color: #2ecc71;">✍️ פתח מבחן עיוני 🔗</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <thead>
+                        <tr><th>נושא נלמד</th><th>חופף</th><th>תוכן והנחיות</th><th>קישור ישיר</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>תרגול הרמת מערכות ותקלות</td><td>מנהל אתר</td>
+                            <td>תרגול מעשי של החניך בליווי מנהל האתר, מעבר על מצגת תקלות.</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>מבחן עיוני</td><td>מנהל אתר</td>
+                            <td>ביצוע מבחן עיוני כתוב.</td>
+                            <td><a href="https://msbagiraadmoutlook.sharepoint.com/:w:/g/Operations/Infantry_Department/IQCucOPovSqGT7PZLCqrMj93AZdmLZ17258Uo9X2NqYvnE0?e=Wwm1lj" target="_blank" class="link-table-btn" style="background-color: #2ecc71;">✍️ פתח מבחן עיוני 🔗</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
                 <h3 class="table-title">יום מס' 6 - ניהול אתר ומבחן מעשי: ניהול אתר מלא, נהלים ומבחן מעשי</h3>
                 <div class="table-container">
@@ -1756,22 +1755,19 @@
                 south.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] });
             }
             if (saved) {
-                if (saved.north && (Array.isArray(saved.north) || typeof saved.north === 'object')) {
-                    const northArr = Array.isArray(saved.north) ? saved.north : Object.values(saved.north);
-                    north = northArr.map(item => ({
-                        id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
-                        dayNum: item.dayNum,
-                        values: normalizeRowValues(item.values)
-                    }));
-                }
-                if (saved.south && (Array.isArray(saved.south) || typeof saved.south === 'object')) {
-                    const southArr = Array.isArray(saved.south) ? saved.south : Object.values(saved.south);
-                    south = southArr.map(item => ({
-                        id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
-                        dayNum: item.dayNum,
-                        values: normalizeRowValues(item.values)
-                    }));
-                }
+                const northRaw = saved.north ? (Array.isArray(saved.north) ? saved.north : Object.values(saved.north)) : [];
+                north = northRaw.filter(Boolean).map(item => ({
+                    id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
+                    dayNum: item.dayNum,
+                    values: normalizeRowValues(item.values)
+                }));
+
+                const southRaw = saved.south ? (Array.isArray(saved.south) ? saved.south : Object.values(saved.south)) : [];
+                south = southRaw.filter(Boolean).map(item => ({
+                    id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
+                    dayNum: item.dayNum,
+                    values: normalizeRowValues(item.values)
+                }));
             }
             allMonthsDataCache[monthIdx] = { north, south };
         }
@@ -1794,8 +1790,8 @@
             }
 
             if (saved) {
-                if (saved.north && (Array.isArray(saved.north) || typeof saved.north === 'object')) {
-                    const northArr = Array.isArray(saved.north) ? saved.north : Object.values(saved.north);
+                if (saved.north) {
+                    const northArr = (Array.isArray(saved.north) ? saved.north : Object.values(saved.north)).filter(Boolean);
                     north = northArr.filter(item => {
                         const dateObj = new Date(currentYear, monthIdx, item.dayNum);
                         const dow = dateObj.getDay();
@@ -1817,8 +1813,8 @@
                         };
                     });
                 }
-                if (saved.south && (Array.isArray(saved.south) || typeof saved.south === 'object')) {
-                    const southArr = Array.isArray(saved.south) ? saved.south : Object.values(saved.south);
+                if (saved.south) {
+                    const southArr = (Array.isArray(saved.south) ? saved.south : Object.values(saved.south)).filter(Boolean);
                     south = southArr.filter(item => {
                         const dateObj = new Date(currentYear, monthIdx, item.dayNum);
                         const dow = dateObj.getDay();
@@ -2038,7 +2034,7 @@
                 const dayNum = dayInfo.day;
 
                 ['north', 'south'].forEach(side => {
-                    const rows = monthData[side].filter(item => item.dayNum === dayNum);
+                    const rows = monthData[side].filter(item => item && item.dayNum === dayNum);
                     rows.forEach(item => {
                         const vals = item.values || [];
                         const notes = vals[9] || '';
@@ -2115,12 +2111,12 @@
 
                 let northRowsWithIndex = [];
                 monthData.north.forEach((item, idx) => {
-                    if (item.dayNum === dayInfo.day) northRowsWithIndex.push({ item, idx });
+                    if (item && item.dayNum === dayInfo.day) northRowsWithIndex.push({ item, idx });
                 });
 
                 let southRowsWithIndex = [];
                 monthData.south.forEach((item, idx) => {
-                    if (item.dayNum === dayInfo.day) southRowsWithIndex.push({ item, idx });
+                    if (item && item.dayNum === dayInfo.day) southRowsWithIndex.push({ item, idx });
                 });
 
                 if (northRowsWithIndex.length === 0) {
@@ -2696,6 +2692,7 @@
 
             const processRows = (rows) => {
                 rows.forEach(item => {
+                    if (!item) return;
                     const vals = item.values || [];
                     const notes = vals[9] || '';
                     const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
@@ -2938,7 +2935,7 @@
                 const monthData = getMonthDataCache(monthIdx);
                 if (!monthData || !monthData[side]) return;
 
-                const idx = monthData[side].findIndex(r => r.id === rowId);
+                const idx = monthData[side].findIndex(r => r && r.id === rowId);
                 if (idx === -1) return;
 
                 monthData[side].splice(idx, 1);
@@ -2951,37 +2948,45 @@
 
         window.showSecondGuideSelect = function(side, monthIdx, rowId) {
             const monthData = getMonthDataCache(monthIdx);
-            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[10]) {
                     rowData.values[10] = "";
-                    updateCacheAndSaveById(side, monthIdx, rowId, 10, "");
+                    updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
                 }
             }
             renderCurrentWeekTables();
         };
 
         window.removeSecondGuideSelect = function(side, monthIdx, rowId) {
-            updateCacheAndSaveById(side, monthIdx, rowId, 10, "");
+            const monthData = getMonthDataCache(monthIdx);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
+            if (cacheIndex !== -1) {
+                updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
+            }
             renderCurrentWeekTables();
         };
 
         window.showSecondGorillaSelect = function(side, monthIdx, rowId) {
             const monthData = getMonthDataCache(monthIdx);
-            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             const rowData = monthData[side][cacheIndex];
             if (rowData) {
                 if (!rowData.values[11]) {
                     rowData.values[11] = "";
-                    updateCacheAndSaveById(side, monthIdx, rowId, 11, "");
+                    updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
                 }
             }
             renderCurrentWeekTables();
         };
 
         window.removeSecondGorillaSelect = function(side, monthIdx, rowId) {
-            updateCacheAndSaveById(side, monthIdx, rowId, 11, "");
+            const monthData = getMonthDataCache(monthIdx);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
+            if (cacheIndex !== -1) {
+                updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
+            }
             renderCurrentWeekTables();
         };
 
@@ -2999,7 +3004,7 @@
             handleSelectChange(selectEl);
 
             const monthData = getMonthDataCache(monthIdx);
-            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             const row = monthData[side][cacheIndex];
 
             if (row) {
@@ -3007,39 +3012,30 @@
                 while (row.values.length < 13) row.values.push("");
 
                 row.values[fieldIndex] = val;
-                const updates = {};
-                updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/${fieldIndex}`] = val;
 
                 if (fieldIndex === 1) {
-                    if (side === 'north') {
-                        row.hasUserModifiedGuide1 = true;
-                        updates[`sheets/${currentYear}_${monthIdx}/north/${cacheIndex}/hasUserModifiedGuide1`] = true;
-                    } else {
-                        row.hasUserModifiedGuide2 = true;
-                        updates[`sheets/${currentYear}_${monthIdx}/south/${cacheIndex}/hasUserModifiedGuide2`] = true;
-                    }
+                    if (side === 'north') row.hasUserModifiedGuide1 = true;
+                    else row.hasUserModifiedGuide2 = true;
 
                     if (window.trainerGorillaMap[val]) {
                         const defaults = window.trainerGorillaMap[val];
-                        if (defaults[0]) {
-                            row.values[7] = defaults[0];
-                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/7`] = defaults[0];
-                        }
-                        if (defaults[1]) {
-                            row.values[11] = defaults[1];
-                            updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/11`] = defaults[1];
-                        }
+                        if (defaults[0]) row.values[7] = defaults[0];
+                        if (defaults[1]) row.values[11] = defaults[1];
                     }
                 }
 
-                try {
-                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(err => {
-                        console.error(err);
-                        showToast("שגיאה בסנכרון לענן", "error");
-                    });
-                } catch (err) {
-                    console.error("Failed fbUpdate:", err);
-                }
+                // כתיבה בטוחה של כל השורה לענן כדי למנוע חורים במערך
+                const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
+                window.fbSet(window.fbRef(window.fbDB, rowPath), {
+                    id: row.id,
+                    dayNum: row.dayNum,
+                    values: normalizeRowValues(row.values),
+                    hasUserModifiedGuide1: !!row.hasUserModifiedGuide1,
+                    hasUserModifiedGuide2: !!row.hasUserModifiedGuide2
+                }).catch(err => {
+                    console.error(err);
+                    showToast("שגיאה בשמירת השינוי בענן", "error");
+                });
 
                 extractMemory(row.values);
                 rebuildDatalists();
@@ -3054,7 +3050,7 @@
             const currentVal = vals[0] || `${dateStr} ${hDayName}`;
             
             const monthData = getMonthDataCache(monthIdx);
-            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
 
             const extraBadge = isExtra ? `<button type="button" class="remove-extra-row-btn" onclick="window.removeExtraRow('${side}', ${monthIdx}, '${rowId}', event)" title="מחק שורה נוספת זו">❌ מחק שורה</button>` : '';
 
@@ -3162,28 +3158,24 @@
                 while (targetRow.values.length < 13) targetRow.values.push("");
 
                 targetRow.values[fieldIndex] = value;
-                
-                const updates = {};
-                updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/${fieldIndex}`] = value;
 
                 if (fieldIndex === 1) {
-                    if (side === 'north') {
-                        targetRow.hasUserModifiedGuide1 = true;
-                        updates[`sheets/${currentYear}_${monthIdx}/north/${cacheIndex}/hasUserModifiedGuide1`] = true;
-                    } else {
-                        targetRow.hasUserModifiedGuide2 = true;
-                        updates[`sheets/${currentYear}_${monthIdx}/south/${cacheIndex}/hasUserModifiedGuide2`] = true;
-                    }
+                    if (side === 'north') targetRow.hasUserModifiedGuide1 = true;
+                    else targetRow.hasUserModifiedGuide2 = true;
                 }
 
-                try {
-                    window.fbUpdate(window.fbRef(window.fbDB), updates).catch(err => {
-                        console.error(err);
-                        showToast("שגיאה בשמירת השינוי בענן", "error");
-                    });
-                } catch (err) {
-                    console.error("Failed fbUpdate:", err);
-                }
+                // תיקון שורש הבעיה: כתיבה של אובייקט שורה מלא (ללא חורים במערך)
+                const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
+                window.fbSet(window.fbRef(window.fbDB, rowPath), {
+                    id: targetRow.id,
+                    dayNum: targetRow.dayNum,
+                    values: normalizeRowValues(targetRow.values),
+                    hasUserModifiedGuide1: !!targetRow.hasUserModifiedGuide1,
+                    hasUserModifiedGuide2: !!targetRow.hasUserModifiedGuide2
+                }).catch(err => {
+                    console.error(err);
+                    showToast("שגיאה בשמירת השינוי בענן", "error");
+                });
 
                 extractMemory(targetRow.values);
                 rebuildDatalists();
@@ -3194,7 +3186,7 @@
 
         window.updateCacheAndSaveById = function(side, monthIdx, rowId, fieldIndex, value) {
             const monthData = getMonthDataCache(monthIdx);
-            const cacheIndex = monthData[side].findIndex(r => r.id === rowId);
+            const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             if (cacheIndex !== -1) {
                 updateCacheAndSave(side, monthIdx, cacheIndex, fieldIndex, value);
             }
@@ -3390,8 +3382,8 @@
             let trainerShifts = [];
             targetWeekObj.days.forEach(dayInfo => {
                 const monthData = getMonthDataCache(dayInfo.month);
-                const nRows = monthData.north.filter(item => item.dayNum === dayInfo.day);
-                const sRows = monthData.south.filter(item => item.dayNum === dayInfo.day);
+                const nRows = monthData.north.filter(item => item && item.dayNum === dayInfo.day);
+                const sRows = monthData.south.filter(item => item && item.dayNum === dayInfo.day);
 
                 [...nRows, ...sRows].forEach(item => {
                     const guide1 = item.values[1] || '';
@@ -3429,7 +3421,7 @@
             const dNum = tomorrow.getDate();
             const monthData = getMonthDataCache(mIdx);
             
-            const rows = monthData[side].filter(item => item.dayNum === dNum);
+            const rows = monthData[side].filter(item => item && item.dayNum === dNum);
             if (!rows || rows.length === 0) {
                 showToast("לא נמצאו נתונים למחר.", "error");
                 return;
@@ -3600,7 +3592,7 @@
                 let hasDayEntries = false;
                 
                 ['north', 'south'].forEach(side => {
-                    monthData[side].filter(item => item.dayNum === dayInfo.day).forEach(item => {
+                    monthData[side].filter(item => item && item.dayNum === dayInfo.day).forEach(item => {
                         const vals = item.values;
                         if (vals[1] || vals[2]) {
                             let guideStr = vals[1] || 'לא צויין';

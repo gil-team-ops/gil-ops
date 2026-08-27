@@ -178,7 +178,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v7';
+                    const CACHE_NAME = 'gorilla-ops-v9';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1719,7 +1719,6 @@
             if (activeMonthRef && activeMonthCallback) {
                 window.fbOff(activeMonthRef, 'value', activeMonthCallback);
             }
-            isInitialWeekLoad = true;
             activeMonthRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
             activeMonthCallback = (snapshot) => {
                 const saved = snapshot.val();
@@ -1906,7 +1905,6 @@
                 );
             }
 
-            // תיקון קריטי: אם המשתמש כבר בחר שבוע (או שכבר טענו את החודש), אל תאפס את activeWeekIndex בעדכוני ענן
             if (prevSelectedWeekNum !== null && !isInitialWeekLoad) {
                 const foundPrevIndex = monthWeeksCache.findIndex(w => w.weekNum === prevSelectedWeekNum);
                 if (foundPrevIndex !== -1) {
@@ -3023,11 +3021,11 @@
 
                     if (window.trainerGorillaMap[val]) {
                         const defaults = window.trainerGorillaMap[val];
-                        if (defaults[0] && !row.values[7]) {
+                        if (defaults[0]) {
                             row.values[7] = defaults[0];
                             updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/7`] = defaults[0];
                         }
-                        if (defaults[1] && !row.values[11]) {
+                        if (defaults[1]) {
                             row.values[11] = defaults[1];
                             updates[`sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}/values/11`] = defaults[1];
                         }

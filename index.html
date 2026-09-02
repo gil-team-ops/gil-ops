@@ -69,6 +69,7 @@
                     "idolevko2_gmail_com": { firstName: "עידו", lastName: "לבקוביץ", phone: "0522988181", email: "idolevko2@gmail.com" },
                     "tomerk2001_gmail_com": { firstName: "תומר", lastName: "כחלון", phone: "0586222992", email: "tomerk2001@gmail.com" },
                     "netashatzberg_gmail_com": { firstName: "נטע", lastName: "שצברג", phone: "0586140806", email: "netashatzberg@gmail.com" },
+                    "nogainbal_gmail_com": { firstName: "נגה", lastName: "", phone: "", email: "nogainbal@gmail.com" },
                     "antonicbc_gmail_com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
                 };
 
@@ -178,7 +179,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v14';
+                    const CACHE_NAME = 'gorilla-ops-v15';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -711,6 +712,7 @@
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('idolevko2@gmail.com')">עידו</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('tomerk2001@gmail.com')">תומר</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('netashatzberg@gmail.com')">נטע</button>
+                    <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('nogainbal@gmail.com')">נגה</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('antonicbc@gmail.com')">מרקו</button>
                 </div>
             </div>
@@ -951,6 +953,7 @@
                                 <option value="עידו לבקוביץ">עידו לבקוביץ</option>
                                 <option value="תומר כחלון">תומר כחלון</option>
                                 <option value="נטע שצברג">נטע שצברג</option>
+                                <option value="נגה">נגה</option>
                                 <option value="מרקו">מרקו</option>
                             </select>
                             <input type="date" id="todoDueDateInput" class="todo-input-date" title="תאריך יעד לביצוע">
@@ -1539,6 +1542,7 @@
                 <option value="עידו לבקוביץ">עידו לבקוביץ</option>
                 <option value="תומר כחלון">תומר כחלון</option>
                 <option value="נטע שצברג">נטע שצברג</option>
+                <option value="נגה">נגה</option>
                 <option value="מרקו">מרקו</option>
             </select>
             
@@ -1589,7 +1593,7 @@
         let activeMonth = new Date().getMonth(); 
         let activeDashboardMonth = new Date().getMonth(); 
         let activeWeekIndex = 0; 
-        let activeWeekNum = null; // נעילת השבוע הנבחר המדויק
+        let activeWeekNum = null; 
         let gorillaChartInstance = null;
         let latestStatusData = {};
         let latestTodosData = {};
@@ -1601,7 +1605,7 @@
         let isInitialWeekLoad = true;
         let monthFetchInFlight = {};
 
-        const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
+        const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "נגה", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
         const systemsOptions = ["", "ללא", "אחוד", "ישלט", "אחוד סימולטיבי"];
 
@@ -1754,7 +1758,6 @@
             setupWeeksCache(monthIdx);
         }
 
-        // פונקציית בניית חודש נקייה המפרידה בין שליפה רגילה לעדכון state גלובלי
         function buildMonthDataFromSaved(monthIdx, saved, isDefaultGuideActive = true) {
             const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
             let north = [];
@@ -1823,7 +1826,6 @@
             return { north, south };
         }
 
-        // שליפה אסינכרונית חד-פעמית של חודש שכן מבלי לדרוס את ה-state של השבועות
         function fetchNeighborMonthOnce(monthIdx) {
             if (monthFetchInFlight[monthIdx]) return;
             monthFetchInFlight[monthIdx] = true;

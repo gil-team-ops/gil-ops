@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=0.85, maximum-scale=3.0, user-scalable=yes">
     <title>תפעול והדרכה - צוות גיל</title>
     
     <!-- PWA Manifest עם אייקונים מלאים ותקניים -->
@@ -548,22 +548,22 @@
         .status-table-container th:nth-child(3), .status-table-container td:nth-child(3) { width: 125px; min-width: 125px; } 
         .status-table-container th:nth-child(4), .status-table-container td:nth-child(4) { width: auto; }                    
 
-        /* שיפור רווחים וריווח שורות בטבלה לשימוש נוח יותר בנייד */
-        table { width: 100%; border-collapse: collapse; font-size: 0.82em; text-align: center; table-layout: auto; }
-        th, td { border: 1px solid var(--border-color); padding: 10px 6px; vertical-align: middle; }
-        th { background-color: var(--th-bg); color: white; font-weight: 600; white-space: nowrap; font-size: 0.85em; padding-top: 12px; padding-bottom: 12px; }
+        /* שיפור רווחים, גופן וזום מותאם לנייד */
+        table { width: 100%; border-collapse: collapse; font-size: 0.88em; text-align: center; table-layout: auto; min-width: 750px; }
+        th, td { border: 1px solid var(--border-color); padding: 12px 8px; vertical-align: middle; }
+        th { background-color: var(--th-bg); color: white; font-weight: 600; white-space: nowrap; font-size: 0.9em; padding-top: 14px; padding-bottom: 14px; }
 
-        .spreadsheet-container table th:nth-child(1), .spreadsheet-container table td:nth-child(1) { width: 75px; min-width: 75px; } 
-        .spreadsheet-container table th:nth-child(2), .spreadsheet-container table td:nth-child(2) { width: 125px; min-width: 125px; } 
-        .spreadsheet-container table th:nth-child(3), .spreadsheet-container table td:nth-child(3) { width: 50px; min-width: 50px; } 
-        .spreadsheet-container table th:nth-child(4), .spreadsheet-container table td:nth-child(4) { width: 50px; min-width: 50px; } 
-        .spreadsheet-container table th:nth-child(5), .spreadsheet-container table td:nth-child(5) { width: 65px; min-width: 65px; } 
-        .spreadsheet-container table th:nth-child(6), .spreadsheet-container table td:nth-child(6) { width: 130px; min-width: 130px; } 
-        .spreadsheet-container table th:nth-child(7), .spreadsheet-container table td:nth-child(7) { width: 40px; min-width: 40px; } 
-        .spreadsheet-container table th:nth-child(8), .spreadsheet-container table td:nth-child(8) { width: 100px; min-width: 100px; } 
-        .spreadsheet-container table th:nth-child(9), .spreadsheet-container table td:nth-child(9) { width: 50px; min-width: 50px; } 
-        .spreadsheet-container table th:nth-child(10), .spreadsheet-container table td:nth-child(10) { width: 110px; min-width: 110px; } 
-        .spreadsheet-container table th:nth-child(11), .spreadsheet-container table td:nth-child(11) { width: 90px; min-width: 90px; } 
+        .spreadsheet-container table th:nth-child(1), .spreadsheet-container table td:nth-child(1) { width: 85px; min-width: 85px; } 
+        .spreadsheet-container table th:nth-child(2), .spreadsheet-container table td:nth-child(2) { width: 140px; min-width: 140px; } 
+        .spreadsheet-container table th:nth-child(3), .spreadsheet-container table td:nth-child(3) { width: 60px; min-width: 60px; } 
+        .spreadsheet-container table th:nth-child(4), .spreadsheet-container table td:nth-child(4) { width: 60px; min-width: 60px; } 
+        .spreadsheet-container table th:nth-child(5), .spreadsheet-container table td:nth-child(5) { width: 75px; min-width: 75px; } 
+        .spreadsheet-container table th:nth-child(6), .spreadsheet-container table td:nth-child(6) { width: 140px; min-width: 140px; } 
+        .spreadsheet-container table th:nth-child(7), .spreadsheet-container table td:nth-child(7) { width: 50px; min-width: 50px; } 
+        .spreadsheet-container table th:nth-child(8), .spreadsheet-container table td:nth-child(8) { width: 110px; min-width: 110px; } 
+        .spreadsheet-container table th:nth-child(9), .spreadsheet-container table td:nth-child(9) { width: 60px; min-width: 60px; } 
+        .spreadsheet-container table th:nth-child(10), .spreadsheet-container table td:nth-child(10) { width: 120px; min-width: 120px; } 
+        .spreadsheet-container table th:nth-child(11), .spreadsheet-container table td:nth-child(11) { width: 100px; min-width: 100px; } 
         
         .today-row td { background-color: #fef08a !important; border-color: #facc15 !important; color: #1e293b !important; font-weight: bold; }
         .today-row .cell-input, .today-row .cell-select { color: #1e293b !important; font-weight: bold; }
@@ -575,19 +575,19 @@
         body.dark-mode .canceled-row td { background-color: rgba(239, 68, 68, 0.3) !important; border-color: #991b1b !important; color: #fca5a5 !important; }
         body.dark-mode .canceled-row .cell-input, body.dark-mode .canceled-row .cell-select { color: #fca5a5 !important; }
 
-        .cell-input { width: 100%; border: none; background: transparent; text-align: center; font-size: 0.95em; color: var(--text-color); outline: none; padding: 4px; min-height: 28px; }
-        .cell-input:focus { background: rgba(2, 132, 199, 0.12); border-radius: 4px; }
+        .cell-input { width: 100%; border: none; background: transparent; text-align: center; font-size: 1em; color: var(--text-color); outline: none; padding: 4px; min-height: 32px; }
+        .cell-input:focus { background: rgba(2, 132, 199, 0.12); border-radius: 6px; }
 
         .cell-select {
             width: 100%; border: 1px solid var(--border-color); background: var(--input-bg);
-            color: var(--text-color); font-size: 0.85em; border-radius: 6px; padding: 4px 2px; outline: none; cursor: pointer; min-height: 30px;
+            color: var(--text-color); font-size: 0.9em; border-radius: 6px; padding: 6px 4px; outline: none; cursor: pointer; min-height: 34px;
         }
         .cell-select.has-selection { appearance: none; -webkit-appearance: none; background: transparent; border: none; text-align-last: center; font-weight: bold; }
 
-        .guides-container, .gorillas-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
-        .guide-row-flex, .gorilla-row-flex { display: flex; align-items: center; gap: 4px; width: 100%; }
+        .guides-container, .gorillas-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .guide-row-flex, .gorilla-row-flex { display: flex; align-items: center; gap: 6px; width: 100%; }
         .add-guide-btn, .remove-guide-btn, .add-gorilla-btn, .remove-gorilla-btn {
-            background: none; border: none; cursor: pointer; font-size: 1em; padding: 2px 4px; line-height: 1; flex-shrink: 0;
+            background: none; border: none; cursor: pointer; font-size: 1.1em; padding: 2px 6px; line-height: 1; flex-shrink: 0;
         }
         .add-guide-btn:hover, .remove-guide-btn:hover, .add-gorilla-btn:hover, .remove-gorilla-btn:hover { transform: scale(1.25) translateY(-1px); }
 
@@ -676,9 +676,9 @@
         }
 
         @media (max-width: 600px) {
-            .cell-input, .cell-select { min-height: 36px; font-size: 0.95em; }
-            table { font-size: 0.85em; }
-            th, td { padding: 12px 6px; }
+            .cell-input, .cell-select { min-height: 38px; font-size: 1em; }
+            table { font-size: 0.9em; }
+            th, td { padding: 14px 10px; }
             main { padding: 10px 8px; }
         }
     </style>
@@ -2955,7 +2955,7 @@
             if (cacheIndex !== -1) {
                 const rowData = monthData[side][cacheIndex];
                 if (rowData) {
-                    rowData.showSecondGuide = true; // דגל זמני להצגת שדה שני
+                    rowData.showSecondGuide = true;
                     if (!rowData.values[10]) {
                         rowData.values[10] = "";
                         updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
@@ -2982,7 +2982,7 @@
             if (cacheIndex !== -1) {
                 const rowData = monthData[side][cacheIndex];
                 if (rowData) {
-                    rowData.showSecondGorilla = true; // דגל זמני להצגת שדה שני
+                    rowData.showSecondGorilla = true;
                     if (!rowData.values[11]) {
                         rowData.values[11] = "";
                         updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
@@ -3035,7 +3035,7 @@
                         if (defaults[0]) row.values[7] = defaults[0];
                         if (defaults[1]) {
                             row.values[11] = defaults[1];
-                            row.showSecondGorilla = true; // פתיחה אוטומטית של הגורילה השנייה אם קיימת בברירת המחדל
+                            row.showSecondGorilla = true;
                         }
                     }
                 }

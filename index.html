@@ -179,7 +179,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v17';
+                    const CACHE_NAME = 'gorilla-ops-v18';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -2954,6 +2954,7 @@
             if (cacheIndex !== -1) {
                 const rowData = monthData[side][cacheIndex];
                 if (rowData) {
+                    rowData.showSecondGuide = true; // דגל זיכרון לפתיחת השדה השני
                     if (!rowData.values[10]) {
                         rowData.values[10] = "";
                         updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
@@ -2967,6 +2968,8 @@
             const monthData = getMonthDataCache(monthIdx);
             const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             if (cacheIndex !== -1) {
+                const rowData = monthData[side][cacheIndex];
+                if (rowData) rowData.showSecondGuide = false;
                 updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
             }
             renderCurrentWeekTables();
@@ -2978,9 +2981,10 @@
             if (cacheIndex !== -1) {
                 const rowData = monthData[side][cacheIndex];
                 if (rowData) {
+                    rowData.showSecondGorilla = true; // דגל זיכרון לפתיחת השדה השני
                     if (!rowData.values[11]) {
                         rowData.values[11] = "";
-                        updateCacheAndSave(side, monthIdx, cacheIndex, 11, ""); // תיקון אינדקס 11 לגורילה השנייה
+                        updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
                     }
                 }
             }
@@ -2991,6 +2995,8 @@
             const monthData = getMonthDataCache(monthIdx);
             const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             if (cacheIndex !== -1) {
+                const rowData = monthData[side][cacheIndex];
+                if (rowData) rowData.showSecondGorilla = false;
                 updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
             }
             renderCurrentWeekTables();
@@ -3056,13 +3062,14 @@
             
             const monthData = getMonthDataCache(monthIdx);
             const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
+            const rowData = monthData[side][cacheIndex];
 
             const extraBadge = isExtra ? `<button type="button" class="remove-extra-row-btn" onclick="window.removeExtraRow('${side}', ${monthIdx}, '${rowId}', event)" title="מחק שורה נוספת זו">❌ מחק שורה</button>` : '';
 
             const guide1Val = vals[1] || '';
             const guide2Val = vals[10] || '';
             const hasGuide1 = guide1Val.trim() !== '';
-            const hasGuide2 = guide2Val.trim() !== '';
+            const hasGuide2 = guide2Val.trim() !== '' || (rowData && rowData.showSecondGuide);
 
             let localGuides1 = [...guidesOptions];
             if (guide1Val && !localGuides1.includes(guide1Val)) {
@@ -3098,7 +3105,7 @@
             const gorilla1Val = vals[7] || '';
             const gorilla2Val = vals[11] || '';
             const hasGorilla1 = gorilla1Val.trim() !== '';
-            const hasGorilla2 = gorilla2Val.trim() !== '';
+            const hasGorilla2 = gorilla2Val.trim() !== '' || (rowData && rowData.showSecondGorilla);
 
             let gorillaCellHTML = `
                 <td>

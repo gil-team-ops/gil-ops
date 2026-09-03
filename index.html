@@ -179,7 +179,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v16';
+                    const CACHE_NAME = 'gorilla-ops-v17';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -2980,7 +2980,7 @@
                 if (rowData) {
                     if (!rowData.values[11]) {
                         rowData.values[11] = "";
-                        updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
+                        updateCacheAndSave(side, monthIdx, cacheIndex, 11, ""); // תיקון אינדקס 11 לגורילה השנייה
                     }
                 }
             }

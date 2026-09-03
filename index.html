@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>תפעול והדרכה - צוות גיל</title>
     
     <!-- PWA Manifest עם אייקונים מלאים ותקניים -->
@@ -179,7 +179,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v18';
+                    const CACHE_NAME = 'gorilla-ops-v19';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -548,9 +548,10 @@
         .status-table-container th:nth-child(3), .status-table-container td:nth-child(3) { width: 125px; min-width: 125px; } 
         .status-table-container th:nth-child(4), .status-table-container td:nth-child(4) { width: auto; }                    
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.78em; text-align: center; table-layout: auto; }
-        th, td { border: 1px solid var(--border-color); padding: 6px 3px; vertical-align: middle; }
-        th { background-color: var(--th-bg); color: white; font-weight: 600; white-space: nowrap; font-size: 0.82em; }
+        /* שיפור רווחים וריווח שורות בטבלה לשימוש נוח יותר בנייד */
+        table { width: 100%; border-collapse: collapse; font-size: 0.82em; text-align: center; table-layout: auto; }
+        th, td { border: 1px solid var(--border-color); padding: 10px 6px; vertical-align: middle; }
+        th { background-color: var(--th-bg); color: white; font-weight: 600; white-space: nowrap; font-size: 0.85em; padding-top: 12px; padding-bottom: 12px; }
 
         .spreadsheet-container table th:nth-child(1), .spreadsheet-container table td:nth-child(1) { width: 75px; min-width: 75px; } 
         .spreadsheet-container table th:nth-child(2), .spreadsheet-container table td:nth-child(2) { width: 125px; min-width: 125px; } 
@@ -574,19 +575,19 @@
         body.dark-mode .canceled-row td { background-color: rgba(239, 68, 68, 0.3) !important; border-color: #991b1b !important; color: #fca5a5 !important; }
         body.dark-mode .canceled-row .cell-input, body.dark-mode .canceled-row .cell-select { color: #fca5a5 !important; }
 
-        .cell-input { width: 100%; border: none; background: transparent; text-align: center; font-size: 0.88em; color: var(--text-color); outline: none; padding: 2px; }
+        .cell-input { width: 100%; border: none; background: transparent; text-align: center; font-size: 0.95em; color: var(--text-color); outline: none; padding: 4px; min-height: 28px; }
         .cell-input:focus { background: rgba(2, 132, 199, 0.12); border-radius: 4px; }
 
         .cell-select {
             width: 100%; border: 1px solid var(--border-color); background: var(--input-bg);
-            color: var(--text-color); font-size: 0.78em; border-radius: 4px; padding: 2px 1px; outline: none; cursor: pointer;
+            color: var(--text-color); font-size: 0.85em; border-radius: 6px; padding: 4px 2px; outline: none; cursor: pointer; min-height: 30px;
         }
         .cell-select.has-selection { appearance: none; -webkit-appearance: none; background: transparent; border: none; text-align-last: center; font-weight: bold; }
 
-        .guides-container, .gorillas-container { display: flex; flex-direction: column; gap: 3px; width: 100%; }
-        .guide-row-flex, .gorilla-row-flex { display: flex; align-items: center; gap: 2px; width: 100%; }
+        .guides-container, .gorillas-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+        .guide-row-flex, .gorilla-row-flex { display: flex; align-items: center; gap: 4px; width: 100%; }
         .add-guide-btn, .remove-guide-btn, .add-gorilla-btn, .remove-gorilla-btn {
-            background: none; border: none; cursor: pointer; font-size: 0.85em; padding: 0 2px; line-height: 1; flex-shrink: 0;
+            background: none; border: none; cursor: pointer; font-size: 1em; padding: 2px 4px; line-height: 1; flex-shrink: 0;
         }
         .add-guide-btn:hover, .remove-guide-btn:hover, .add-gorilla-btn:hover, .remove-gorilla-btn:hover { transform: scale(1.25) translateY(-1px); }
 
@@ -675,9 +676,9 @@
         }
 
         @media (max-width: 600px) {
-            .cell-input, .cell-select { min-height: 34px; font-size: 0.92em; }
-            table { font-size: 0.82em; }
-            th, td { padding: 8px 4px; }
+            .cell-input, .cell-select { min-height: 36px; font-size: 0.95em; }
+            table { font-size: 0.85em; }
+            th, td { padding: 12px 6px; }
             main { padding: 10px 8px; }
         }
     </style>
@@ -2954,7 +2955,7 @@
             if (cacheIndex !== -1) {
                 const rowData = monthData[side][cacheIndex];
                 if (rowData) {
-                    rowData.showSecondGuide = true; // דגל זיכרון לפתיחת השדה השני
+                    rowData.showSecondGuide = true; // דגל זמני להצגת שדה שני
                     if (!rowData.values[10]) {
                         rowData.values[10] = "";
                         updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
@@ -2981,7 +2982,7 @@
             if (cacheIndex !== -1) {
                 const rowData = monthData[side][cacheIndex];
                 if (rowData) {
-                    rowData.showSecondGorilla = true; // דגל זיכרון לפתיחת השדה השני
+                    rowData.showSecondGorilla = true; // דגל זמני להצגת שדה שני
                     if (!rowData.values[11]) {
                         rowData.values[11] = "";
                         updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
@@ -3032,7 +3033,10 @@
                     if (window.trainerGorillaMap[val]) {
                         const defaults = window.trainerGorillaMap[val];
                         if (defaults[0]) row.values[7] = defaults[0];
-                        if (defaults[1]) row.values[11] = defaults[1];
+                        if (defaults[1]) {
+                            row.values[11] = defaults[1];
+                            row.showSecondGorilla = true; // פתיחה אוטומטית של הגורילה השנייה אם קיימת בברירת המחדל
+                        }
                     }
                 }
 

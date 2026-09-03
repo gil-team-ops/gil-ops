@@ -179,7 +179,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v20';
+                    const CACHE_NAME = 'gorilla-ops-v21';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -548,23 +548,28 @@
         .status-table-container th:nth-child(3), .status-table-container td:nth-child(3) { width: 125px; min-width: 125px; } 
         .status-table-container th:nth-child(4), .status-table-container td:nth-child(4) { width: auto; }                    
 
-        /* שיפור רווחים, גופן וזום מותאם לנייד לטבלאות סידור עבודה */
+        /* עיצוב ייעודי לטבלת סידור העבודה בלבד */
         .spreadsheet-container table { width: 100%; border-collapse: collapse; font-size: 0.78em; text-align: center; table-layout: auto; min-width: 950px; }
         .spreadsheet-container th, .spreadsheet-container td { border: 1px solid var(--border-color); padding: 10px 8px; vertical-align: middle; }
         .spreadsheet-container th { background-color: var(--th-bg); color: white; font-weight: 600; white-space: nowrap; font-size: 0.82em; padding-top: 12px; padding-bottom: 12px; }
 
-        /* הגדרת רוחב מרווח ומותאם לכל עמודה בסידור עבודה */
-        .spreadsheet-container table th:nth-child(1), .spreadsheet-container table td:nth-child(1) { width: 85px; min-width: 85px; }   /* תאריך */
-        .spreadsheet-container table th:nth-child(2), .spreadsheet-container table td:nth-child(2) { width: 155px; min-width: 155px; } /* מדריך */
-        .spreadsheet-container table th:nth-child(3), .spreadsheet-container table td:nth-child(3) { width: 95px; min-width: 95px; }   /* כוח מתאמן */
-        .spreadsheet-container table th:nth-child(4), .spreadsheet-container table td:nth-child(4) { width: 95px; min-width: 95px; }   /* מיקום */
-        .spreadsheet-container table th:nth-child(5), .spreadsheet-container table td:nth-child(5) { width: 85px; min-width: 85px; }   /* ישלט/אחוד */
-        .spreadsheet-container table th:nth-child(6), .spreadsheet-container table td:nth-child(6) { width: 140px; min-width: 140px; } /* איש קשר */
-        .spreadsheet-container table th:nth-child(7), .spreadsheet-container table td:nth-child(7) { width: 65px; min-width: 65px; }   /* מס' מתאמנים */
-        .spreadsheet-container table th:nth-child(8), .spreadsheet-container table td:nth-child(8) { width: 140px; min-width: 140px; } /* גורילה */
-        .spreadsheet-container table th:nth-child(9), .spreadsheet-container table td:nth-child(9) { width: 85px; min-width: 85px; }   /* שעות */
-        .spreadsheet-container table th:nth-child(10), .spreadsheet-container table td:nth-child(10) { width: 150px; min-width: 150px; } /* הערות */
-        .spreadsheet-container table th:nth-child(11), .spreadsheet-container table td:nth-child(11) { width: 95px; min-width: 95px; }   /* ניידת */
+        /* שאר הטבלאות באתר (הסמכה, תקלות, סטטוס) חוזרות לעיצוב הרגיל והתקני מימין לשמאל */
+        section:not(#schedule) table { width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: right; }
+        section:not(#schedule) th, section:not(#schedule) td { border: 1px solid var(--border-color); padding: 8px 12px; vertical-align: middle; text-align: right; }
+        section:not(#schedule) th { background-color: var(--th-bg); color: white; text-align: right; }
+
+        /* רוחבי עמודות בסידור העבודה */
+        .spreadsheet-container table th:nth-child(1), .spreadsheet-container table td:nth-child(1) { width: 85px; min-width: 85px; } 
+        .spreadsheet-container table th:nth-child(2), .spreadsheet-container table td:nth-child(2) { width: 155px; min-width: 155px; } 
+        .spreadsheet-container table th:nth-child(3), .spreadsheet-container table td:nth-child(3) { width: 95px; min-width: 95px; } 
+        .spreadsheet-container table th:nth-child(4), .spreadsheet-container table td:nth-child(4) { width: 95px; min-width: 95px; } 
+        .spreadsheet-container table th:nth-child(5), .spreadsheet-container table td:nth-child(5) { width: 75px; min-width: 75px; } 
+        .spreadsheet-container table th:nth-child(6), .spreadsheet-container table td:nth-child(6) { width: 140px; min-width: 140px; } 
+        .spreadsheet-container table th:nth-child(7), .spreadsheet-container table td:nth-child(7) { width: 65px; min-width: 65px; } 
+        .spreadsheet-container table th:nth-child(8), .spreadsheet-container table td:nth-child(8) { width: 140px; min-width: 140px; } 
+        .spreadsheet-container table th:nth-child(9), .spreadsheet-container table td:nth-child(9) { width: 85px; min-width: 85px; } 
+        .spreadsheet-container table th:nth-child(10), .spreadsheet-container table td:nth-child(10) { width: 150px; min-width: 150px; } 
+        .spreadsheet-container table th:nth-child(11), .spreadsheet-container table td:nth-child(11) { width: 95px; min-width: 95px; } 
         
         .today-row td { background-color: #fef08a !important; border-color: #facc15 !important; color: #1e293b !important; font-weight: bold; }
         .today-row .cell-input, .today-row .cell-select { color: #1e293b !important; font-weight: bold; }
@@ -678,8 +683,8 @@
 
         @media (max-width: 600px) {
             .cell-input, .cell-select { min-height: 36px; font-size: 0.95em; }
-            table { font-size: 0.85em; }
-            th, td { padding: 12px 8px; }
+            .spreadsheet-container table { font-size: 0.85em; }
+            .spreadsheet-container th, .spreadsheet-container td { padding: 12px 8px; }
             main { padding: 10px 8px; }
         }
     </style>

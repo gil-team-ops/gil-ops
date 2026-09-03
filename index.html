@@ -179,7 +179,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v15';
+                    const CACHE_NAME = 'gorilla-ops-v16';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -2951,11 +2951,13 @@
         window.showSecondGuideSelect = function(side, monthIdx, rowId) {
             const monthData = getMonthDataCache(monthIdx);
             const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
-            const rowData = monthData[side][cacheIndex];
-            if (rowData) {
-                if (!rowData.values[10]) {
-                    rowData.values[10] = "";
-                    updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
+            if (cacheIndex !== -1) {
+                const rowData = monthData[side][cacheIndex];
+                if (rowData) {
+                    if (!rowData.values[10]) {
+                        rowData.values[10] = "";
+                        updateCacheAndSave(side, monthIdx, cacheIndex, 10, "");
+                    }
                 }
             }
             renderCurrentWeekTables();
@@ -2973,11 +2975,13 @@
         window.showSecondGorillaSelect = function(side, monthIdx, rowId) {
             const monthData = getMonthDataCache(monthIdx);
             const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
-            const rowData = monthData[side][cacheIndex];
-            if (rowData) {
-                if (!rowData.values[11]) {
-                    rowData.values[11] = "";
-                    updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
+            if (cacheIndex !== -1) {
+                const rowData = monthData[side][cacheIndex];
+                if (rowData) {
+                    if (!rowData.values[11]) {
+                        rowData.values[11] = "";
+                        updateCacheAndSave(side, monthIdx, cacheIndex, 11, "");
+                    }
                 }
             }
             renderCurrentWeekTables();

@@ -70,6 +70,7 @@
                     "tomerk2001_gmail_com": { firstName: "תומר", lastName: "כחלון", phone: "0586222992", email: "tomerk2001@gmail.com" },
                     "netashatzberg_gmail_com": { firstName: "נטע", lastName: "שצברג", phone: "0586140806", email: "netashatzberg@gmail.com" },
                     "nogainbal_gmail_com": { firstName: "נגה", lastName: "", phone: "", email: "nogainbal@gmail.com" },
+                    "koren_reznik_gmail_com": { firstName: "קרן", lastName: "רזניק", phone: "", email: "koren.reznik@gmail.com" },
                     "antonicbc_gmail_com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
                 };
 
@@ -179,7 +180,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v23';
+                    const CACHE_NAME = 'gorilla-ops-v24';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -1476,7 +1477,7 @@
                         </table>
                     </div>
 
-                    <!-- טבלאות נוספות שהוספו לפי בקשתך -->
+                    <!-- טבלאות נוספות שהוספו לפי בקשתך (עם התיקונים המדויקים) -->
                     <h4 style="margin: 16px 0 6px 0; font-size: 0.95em; color: var(--link-color);">📊 טבלת גובה מעוף הטיל ביחס למרחק</h4>
                     
                     <p style="font-size: 0.82em; font-weight: bold; margin: 8px 0 4px 0;">טבלת גובה מעוף הטיל ביחס למרחק גיל 1:</p>
@@ -1546,7 +1547,9 @@
                                 </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">נמוך</td>
-                                    <td style="padding: 8px;" colspan="5">מטפס למקסימום של 100 מ' מעל קו ראיה למטרה</td>
+                                    <td style="padding: 8px;">180</td>
+                                    <td style="padding: 8px;">90</td>
+                                    <td style="padding: 8px;" colspan="3">מטפס למקסימום של 100 מ' מעל קו ראיה למטרה</td>
                                 </tr>
                             </tbody>
                         </table>

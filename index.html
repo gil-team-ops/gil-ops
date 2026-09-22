@@ -180,7 +180,7 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v24';
+                    const CACHE_NAME = 'gorilla-ops-v25';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -721,6 +721,7 @@
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('tomerk2001@gmail.com')">תומר</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('netashatzberg@gmail.com')">נטע</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('nogainbal@gmail.com')">נגה</button>
+                    <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('koren.reznik@gmail.com')">קרן</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('antonicbc@gmail.com')">מרקו</button>
                 </div>
             </div>
@@ -859,83 +860,8 @@
 
             <!-- לשונית דשבורד סטטיסטי -->
             <section id="dashboard" class="tab-content">
-                <div class="dashboard-header">
-                    <h2>📈 דשבורד סטטיסטי</h2>
-                    <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
-                </div>
-
-                <!-- 4 כרטיסי KPI עליונים -->
-                <div class="dashboard-kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpiTotalGorillas" style="color: #64748b;">7</div>
-                        <div class="kpi-title">סה"כ גורילות</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpiHealthyGorillas" style="color: #22c55e;">0</div>
-                        <div class="kpi-title">✅ תקינות</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value" id="kpiFaultyGorillas" style="color: #ef4444;">0</div>
-                        <div class="kpi-title">⚠️ לא תקינות</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-value" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                            <span id="kpiMonthTrainingDays" style="color: #0284c7;">0</span>
-                            <span style="color: #64748b; font-size: 0.8em;">/</span>
-                            <span id="kpiMonthCanceledDays" style="color: #ef4444;">0</span>
-                        </div>
-                        <div class="kpi-title">📅 ימי אימון חודשי <span style="color: #ef4444; font-size: 0.9em;">(ימים שבוטלו)</span></div>
-                    </div>
-                </div>
-
-                <!-- גריד מרכזי: נתוני פעילות חודשית + נתוני גורילות -->
-                <div class="dashboard-main-grid">
-                    <div class="dashboard-box">
-                        <div class="dashboard-box-title">
-                            <span>📊 נתוני גורילות (ימים מאז טיפול מול ימי אימון)</span>
-                            <span id="chartMonthLabel" style="font-size:0.8em; color:#0284c7;"></span>
-                        </div>
-                        <div style="position: relative; height: 280px; width: 100%;">
-                            <canvas id="gorillaBarChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-box">
-                        <div class="dashboard-box-title">
-                            <span>📋 סיכום פעילות - <span id="statsMonthTitle"></span></span>
-                        </div>
-                        <div class="stats-items-list">
-                            <div class="stat-item-row">
-                                <span class="stat-item-label">👥 סה"כ מתאמנים:</span>
-                                <span class="stat-item-value" id="dashTotalTrainees">0</span>
-                            </div>
-                            <div class="stat-item-row">
-                                <span class="stat-item-label">⏱️ סה"כ שעות פעילות (הערכה):</span>
-                                <span class="stat-item-value" id="dashTotalHours">0 שעות</span>
-                            </div>
-                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                                <span class="stat-item-label">📍 מיקומי אימון בחודש:</span>
-                                <div class="badges-wrap" id="dashLocationsList"></div>
-                            </div>
-                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                                <span class="stat-item-label">🛡️ כוחות מתאמנים (יחידות):</span>
-                                <div class="badges-wrap" id="dashUnitsList"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ריכוז תקלות פתוחות -->
-                <div class="faults-section">
-                    <div class="dashboard-box-title" style="border-bottom-color: rgba(239, 68, 68, 0.2); color: #ef4444;">
-                        <span>🔧 תקלות פתוחות כרגע</span>
-                        <span id="faultsCountBadge" style="font-size: 0.8em; background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px;">0 תקלות</span>
-                    </div>
-                    <div id="openFaultsContainer"></div>
-                </div>
-
-                <!-- סרגל חודשים בתחתית הדשבורד -->
-                <div class="month-folders-bar" id="dashboardMonthTabs"></div>
+                <h2>📈 דשבורד סטטיסטי</h2>
+                <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
             </section>
 
             <!-- לשונית משימות To-Do -->
@@ -962,6 +888,7 @@
                                 <option value="תומר כחלון">תומר כחלון</option>
                                 <option value="נטע שצברג">נטע שצברג</option>
                                 <option value="נגה">נגה</option>
+                                <option value="קרן">קרן</option>
                                 <option value="מרקו">מרקו</option>
                             </select>
                             <input type="date" id="todoDueDateInput" class="todo-input-date" title="תאריך יעד לביצוע">
@@ -1477,7 +1404,7 @@
                         </table>
                     </div>
 
-                    <!-- טבלאות נוספות שהוספו לפי בקשתך (עם התיקונים המדויקים) -->
+                    <!-- טבלאות נוספות מעודכנות בדיוק לפי התמונה -->
                     <h4 style="margin: 16px 0 6px 0; font-size: 0.95em; color: var(--link-color);">📊 טבלת גובה מעוף הטיל ביחס למרחק</h4>
                     
                     <p style="font-size: 0.82em; font-weight: bold; margin: 8px 0 4px 0;">טבלת גובה מעוף הטיל ביחס למרחק גיל 1:</p>
@@ -1547,8 +1474,8 @@
                                 </tr>
                                 <tr>
                                     <td style="padding: 8px; font-weight: bold;">נמוך</td>
-                                    <td style="padding: 8px;">180</td>
                                     <td style="padding: 8px;">90</td>
+                                    <td style="padding: 8px;">180</td>
                                     <td style="padding: 8px;" colspan="3">מטפס למקסימום של 100 מ' מעל קו ראיה למטרה</td>
                                 </tr>
                             </tbody>
@@ -1708,6 +1635,7 @@
                 <option value="תומר כחלון">תומר כחלון</option>
                 <option value="נטע שצברג">נטע שצברג</option>
                 <option value="נגה">נגה</option>
+                <option value="קרן">קרן</option>
                 <option value="מרקו">מרקו</option>
             </select>
             
@@ -1770,7 +1698,7 @@
         let isInitialWeekLoad = true;
         let monthFetchInFlight = {};
 
-        const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "נגה", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
+        const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "נגה", "קרן", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
         const systemsOptions = ["", "ללא", "אחוד", "ישלט", "אחוד סימולטיבי"];
 

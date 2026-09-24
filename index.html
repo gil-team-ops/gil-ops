@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
     <title>תפעול והדרכה - צוות גיל</title>
     
-    <!-- PWA Manifest עם אייקונים מלאים ותקניים -->
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D7%AA%D7%A4%D7%A2%D7%95%D7%9C%20%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94%20-%20%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22short_name%22%3A%22%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%231a252f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0iIzAyODRjNyIvPjxwZXRoIGQ9Ik0xNTYgMjU2bCA4MCA4MCAxMzItMTMyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aッドD0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D7%AA%D7%A4%D7%A2%D7%95%D7%9C%20%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94%20-%20%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22short_name%22%3A%22%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%231a252f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0iIzAyODRjNyIvPjxwZXRoIGQ9Ik0xNTYgMjU2bCA4MCA4MCAxMzItMTMyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
     <meta name="theme-color" content="#1a252f">
 
-    <!-- Chart.js לסרגל נתונים ודשבורד אינטראקטיבי -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Supabase SDK -->
@@ -175,12 +175,12 @@
         });
     </script>
 
-    <!-- PWA Service Worker יציב -->
+    <!-- PWA Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'gorilla-ops-v25';
+                    const CACHE_NAME = 'gorilla-ops-v26';
                     const ASSETS = ['./', './index.html', 'https://cdn.jsdelivr.net/npm/chart.js', 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'];
                     
                     self.addEventListener('install', (e) => {
@@ -265,7 +265,6 @@
             transform: translateY(0);
         }
 
-        /* Toast הודעות שגיאה והצלחה */
         #toastContainer {
             position: fixed; bottom: 20px; left: 20px; z-index: 999999;
             display: flex; flex-direction: column; gap: 8px; pointer-events: none;
@@ -559,18 +558,41 @@
         section:not(#schedule) th, section:not(#schedule) td { border: 1px solid var(--border-color); padding: 8px 12px; vertical-align: middle; text-align: right; }
         section:not(#schedule) th { background-color: var(--th-bg); color: white; text-align: right; }
 
-        /* רוחבי עמודות בסידור העבודה */
-        .spreadsheet-container table th:nth-child(1), .spreadsheet-container table td:nth-child(1) { width: 85px; min-width: 85px; } 
-        .spreadsheet-container table th:nth-child(2), .spreadsheet-container table td:nth-child(2) { width: 155px; min-width: 155px; } 
-        .spreadsheet-container table th:nth-child(3), .spreadsheet-container table td:nth-child(3) { width: 95px; min-width: 95px; } 
-        .spreadsheet-container table th:nth-child(4), .spreadsheet-container table td:nth-child(4) { width: 95px; min-width: 95px; } 
-        .spreadsheet-container table th:nth-child(5), .spreadsheet-container table td:nth-child(5) { width: 75px; min-width: 75px; } 
-        .spreadsheet-container table th:nth-child(6), .spreadsheet-container table td:nth-child(6) { width: 140px; min-width: 140px; } 
-        .spreadsheet-container table th:nth-child(7), .spreadsheet-container table td:nth-child(7) { width: 65px; min-width: 65px; } 
-        .spreadsheet-container table th:nth-child(8), .spreadsheet-container table td:nth-child(8) { width: 140px; min-width: 140px; } 
-        .spreadsheet-container table th:nth-child(9), .spreadsheet-container table td:nth-child(9) { width: 85px; min-width: 85px; } 
-        .spreadsheet-container table th:nth-child(10), .spreadsheet-container table td:nth-child(10) { width: 150px; min-width: 150px; } 
-        .spreadsheet-container table th:nth-child(11), .spreadsheet-container table td:nth-child(11) { width: 95px; min-width: 95px; } 
+        /* רוחבי עמודות בסידור העבודה - ניידת 1 ו-2 (11 עמודות) */
+        #sheetNorthTable th:nth-child(1), #sheetNorthTable td:nth-child(1),
+        #sheetSouthTable th:nth-child(1), #sheetSouthTable td:nth-child(1) { width: 85px; min-width: 85px; } 
+        #sheetNorthTable th:nth-child(2), #sheetNorthTable td:nth-child(2),
+        #sheetSouthTable th:nth-child(2), #sheetSouthTable td:nth-child(2) { width: 155px; min-width: 155px; } 
+        #sheetNorthTable th:nth-child(3), #sheetNorthTable td:nth-child(3),
+        #sheetSouthTable th:nth-child(3), #sheetSouthTable td:nth-child(3) { width: 95px; min-width: 95px; } 
+        #sheetNorthTable th:nth-child(4), #sheetNorthTable td:nth-child(4),
+        #sheetSouthTable th:nth-child(4), #sheetSouthTable td:nth-child(4) { width: 95px; min-width: 95px; } 
+        #sheetNorthTable th:nth-child(5), #sheetNorthTable td:nth-child(5),
+        #sheetSouthTable th:nth-child(5), #sheetSouthTable td:nth-child(5) { width: 75px; min-width: 75px; } 
+        #sheetNorthTable th:nth-child(6), #sheetNorthTable td:nth-child(6),
+        #sheetSouthTable th:nth-child(6), #sheetSouthTable td:nth-child(6) { width: 140px; min-width: 140px; } 
+        #sheetNorthTable th:nth-child(7), #sheetNorthTable td:nth-child(7),
+        #sheetSouthTable th:nth-child(7), #sheetSouthTable td:nth-child(7) { width: 65px; min-width: 65px; } 
+        #sheetNorthTable th:nth-child(8), #sheetNorthTable td:nth-child(8),
+        #sheetSouthTable th:nth-child(8), #sheetSouthTable td:nth-child(8) { width: 140px; min-width: 140px; } 
+        #sheetNorthTable th:nth-child(9), #sheetNorthTable td:nth-child(9),
+        #sheetSouthTable th:nth-child(9), #sheetSouthTable td:nth-child(9) { width: 85px; min-width: 85px; } 
+        #sheetNorthTable th:nth-child(10), #sheetNorthTable td:nth-child(10),
+        #sheetSouthTable th:nth-child(10), #sheetSouthTable td:nth-child(10) { width: 150px; min-width: 150px; } 
+        #sheetNorthTable th:nth-child(11), #sheetNorthTable td:nth-child(11),
+        #sheetSouthTable th:nth-child(11), #sheetSouthTable td:nth-child(11) { width: 95px; min-width: 95px; } 
+
+        /* רוחבי עמודות ייעודיים לטבלת אליקים נייח (10 עמודות - ללא גורילה) */
+        #sheetStationaryTable th:nth-child(1), #sheetStationaryTable td:nth-child(1) { width: 85px; min-width: 85px; }
+        #sheetStationaryTable th:nth-child(2), #sheetStationaryTable td:nth-child(2) { width: 165px; min-width: 165px; }
+        #sheetStationaryTable th:nth-child(3), #sheetStationaryTable td:nth-child(3) { width: 110px; min-width: 110px; }
+        #sheetStationaryTable th:nth-child(4), #sheetStationaryTable td:nth-child(4) { width: 105px; min-width: 105px; }
+        #sheetStationaryTable th:nth-child(5), #sheetStationaryTable td:nth-child(5) { width: 85px; min-width: 85px; }
+        #sheetStationaryTable th:nth-child(6), #sheetStationaryTable td:nth-child(6) { width: 140px; min-width: 140px; }
+        #sheetStationaryTable th:nth-child(7), #sheetStationaryTable td:nth-child(7) { width: 75px; min-width: 75px; }
+        #sheetStationaryTable th:nth-child(8), #sheetStationaryTable td:nth-child(8) { width: 95px; min-width: 95px; }
+        #sheetStationaryTable th:nth-child(9), #sheetStationaryTable td:nth-child(9) { width: 160px; min-width: 160px; }
+        #sheetStationaryTable th:nth-child(10), #sheetStationaryTable td:nth-child(10) { width: 95px; min-width: 95px; }
         
         .today-row td { background-color: #fef08a !important; border-color: #facc15 !important; color: #1e293b !important; font-weight: bold; }
         .today-row .cell-input, .today-row .cell-select { color: #1e293b !important; font-weight: bold; }
@@ -665,7 +687,6 @@
         .slide-img-box { text-align: center; margin: 12px 0; }
         .slide-img-box img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        /* ===== שיפורי נגישות לנייד - טבלאות וגלילה ===== */
         .table-container, .status-table-container { -webkit-overflow-scrolling: touch; scroll-behavior: smooth; overscroll-behavior-x: contain; }
 
         @media (max-width: 768px) {
@@ -788,6 +809,7 @@
                 <div class="week-tabs-bar" id="weekTabsBar"></div>
 
                 <div class="spreadsheet-container">
+                    <!-- ניידת 1 צפון -->
                     <div class="sheet-box">
                         <div class="sheet-side-header">
                             <span>ניידת 1 צפון</span>
@@ -821,6 +843,7 @@
                         </div>
                     </div>
 
+                    <!-- ניידת 2 מרכז/דרום -->
                     <div class="sheet-box">
                         <div class="sheet-side-header">
                             <span>ניידת 2 מרכז/דרום</span>
@@ -853,6 +876,39 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- אליקים נייח (ללא עמודת גורילה) -->
+                    <div class="sheet-box">
+                        <div class="sheet-side-header">
+                            <span>אליקים נייח</span>
+                            <div class="header-btns-group">
+                                <button class="unit-add-btn" onclick="promptAddExtraRow('stationary')" title="הוסף שורה נוספת לתאריך">➕ הוסף שורה</button>
+                                <button class="unit-wa-btn" onclick="sendTomorrowReminder('stationary')">
+                                    <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                                    שלח הודעה למתאמנים של מחר
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table id="sheetStationaryTable">
+                                <thead>
+                                    <tr>
+                                        <th>תאריך</th>
+                                        <th>מדריך</th>
+                                        <th>כוח מתאמן</th>
+                                        <th>מיקום</th>
+                                        <th>ישלט/אחוד</th>
+                                        <th>איש קשר</th>
+                                        <th>מס מתאמנים</th>
+                                        <th>שעות</th>
+                                        <th>הערות</th>
+                                        <th>ניידת</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stationaryTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="month-folders-bar" id="monthFoldersBar"></div>
@@ -862,6 +918,71 @@
             <section id="dashboard" class="tab-content">
                 <h2>📈 דשבורד סטטיסטי</h2>
                 <p>תמונת מצב חיה של פעילות החודש, זמינות המאמנים ותקלות פתוחות. מתעדכן אוטומטית בכל שינוי.</p>
+                <div class="month-folders-bar" id="dashboardMonthTabs" style="margin-bottom: 20px;"></div>
+
+                <div class="dashboard-kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiMonthTrainingDays" style="color: #0284c7;">0</div>
+                        <div class="kpi-title">ימי אימון שבוצעו החודש</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiMonthCanceledDays" style="color: #ef4444;">0</div>
+                        <div class="kpi-title">אימונים שבוטלו החודש</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiHealthyGorillas" style="color: #22c55e;">0</div>
+                        <div class="kpi-title">מאמנים תקינים כעת</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiFaultyGorillas" style="color: #f59e0b;">0</div>
+                        <div class="kpi-title">מאמנים עם תקלה פתוחה</div>
+                    </div>
+                </div>
+
+                <div class="faults-section">
+                    <h3 style="margin-top:0; color:#ef4444; font-size:1.1em; display:flex; justify-content:space-between; align-items:center;">
+                        <span>⚠️ ריכוז תקלות פתוחות במאמנים</span>
+                        <span id="faultsCountBadge" class="info-tag" style="background:#fee2e2; color:#991b1b; border-color:#f87171;">0 תקלות</span>
+                    </h3>
+                    <div id="openFaultsContainer"></div>
+                </div>
+
+                <div class="dashboard-main-grid">
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-title">
+                            <span>📊 מעקב פעילות ותחזוקה לגורילות</span>
+                            <span id="chartMonthLabel" style="font-size:0.8em; color:#64748b;"></span>
+                        </div>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="gorillaBarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-box">
+                        <div class="dashboard-box-title">
+                            <span>📋 סיכום נתונים חודשי</span>
+                            <span id="statsMonthTitle" style="font-size:0.8em; color:#64748b;"></span>
+                        </div>
+                        <div class="stats-items-list">
+                            <div class="stat-item-row">
+                                <span class="stat-item-label">סה"כ מתאמנים שהודרכו:</span>
+                                <span class="stat-item-value" id="dashTotalTrainees">0 מתאמנים</span>
+                            </div>
+                            <div class="stat-item-row">
+                                <span class="stat-item-label">סה"כ שעות הדרכה משוערכות:</span>
+                                <span class="stat-item-value" id="dashTotalHours">0 שעות</span>
+                            </div>
+                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                                <span class="stat-item-label">יחידות שהתאמנו החודש:</span>
+                                <div class="badges-wrap" id="dashUnitsList"></div>
+                            </div>
+                            <div class="stat-item-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                                <span class="stat-item-label">מיקומי ושטחי אימון:</span>
+                                <div class="badges-wrap" id="dashLocationsList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- לשונית משימות To-Do -->
@@ -874,7 +995,6 @@
                         </div>
                     </div>
 
-                    <!-- כרטיס הוספת משימה חדשה -->
                     <form class="todo-add-card" onsubmit="handleCreateTodo(event)">
                         <div class="todo-inputs-row">
                             <input type="text" id="todoTitleInput" class="todo-input-title" placeholder="➕ הוסף משימה חדשה..." required>
@@ -896,10 +1016,8 @@
                         </div>
                     </form>
 
-                    <!-- רשימת משימות פעילות -->
                     <div class="todo-list-wrap" id="activeTodoList"></div>
 
-                    <!-- רשימת משימות שהושלמו -->
                     <div id="completedTodoSection" style="display:none; margin-top:20px;">
                         <h4 style="margin: 0 0 10px 0; font-size:0.9em; color:#94a3b8; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
                             ✔️ הושלמו (<span id="completedCountDisplay">0</span>)
@@ -1404,7 +1522,6 @@
                         </table>
                     </div>
 
-                    <!-- טבלאות נוספות מעודכנות בדיוק לפי התמונה -->
                     <h4 style="margin: 16px 0 6px 0; font-size: 0.95em; color: var(--link-color);">📊 טבלת גובה מעוף הטיל ביחס למרחק</h4>
                     
                     <p style="font-size: 0.82em; font-weight: bold; margin: 8px 0 4px 0;">טבלת גובה מעוף הטיל ביחס למרחק גיל 1:</p>
@@ -1677,7 +1794,6 @@
     </div>
 
     <div id="datalistsContainer"></div>
-
     <script>
         const hebrewDaysShort = ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"];
         const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
@@ -1855,6 +1971,8 @@
             const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
             let north = [];
             let south = [];
+            let stationary = [];
+
             for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
                 const dateObj = new Date(currentYear, monthIdx, dayNum);
                 const dayOfWeek = dateObj.getDay(); 
@@ -1866,6 +1984,7 @@
 
                 north.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", defaultGuideNorth, "", "", "", "", "", "", "", "", "", "", ""] });
                 south.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", defaultGuideSouth, "", "", "", "", "", "", "", "", "", "", ""] });
+                stationary.push({ id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum, hDayName, isWeekend: false, values: ["", "", "", "", "", "", "", "", "", "", "", "", ""] });
             }
 
             if (saved) {
@@ -1915,8 +2034,26 @@
                         };
                     });
                 }
+                if (saved.stationary) {
+                    const statArr = (Array.isArray(saved.stationary) ? saved.stationary : Object.values(saved.stationary)).filter(Boolean);
+                    stationary = statArr.filter(item => {
+                        const dateObj = new Date(currentYear, monthIdx, item.dayNum);
+                        const dow = dateObj.getDay();
+                        return dow !== 5 && dow !== 6;
+                    }).map(item => {
+                        const dateObj = new Date(currentYear, monthIdx, item.dayNum);
+                        let currentVals = normalizeRowValues(item.values);
+                        return {
+                            id: item.id || ('row_' + Math.random().toString(36).substr(2, 9)),
+                            dayNum: item.dayNum,
+                            hDayName: hebrewDaysShort[dateObj.getDay()],
+                            isWeekend: false,
+                            values: currentVals
+                        };
+                    });
+                }
             }
-            return { north, south };
+            return { north, south, stationary };
         }
 
         function fetchNeighborMonthOnce(monthIdx) {
@@ -1940,8 +2077,11 @@
 
         function setupWeeksCache(monthIdx) {
             const mData = getMonthDataCache(monthIdx);
-            if (mData && mData.north) mData.north.forEach(item => extractMemory(item.values));
-            if (mData && mData.south) mData.south.forEach(item => extractMemory(item.values));
+            if (mData) {
+                if (mData.north) mData.north.forEach(item => extractMemory(item.values));
+                if (mData.south) mData.south.forEach(item => extractMemory(item.values));
+                if (mData.stationary) mData.stationary.forEach(item => extractMemory(item.values));
+            }
 
             const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
             const weeksMap = new Map();
@@ -2128,15 +2268,15 @@
                 const monthData = getMonthDataCache(dayInfo.month);
                 const dayNum = dayInfo.day;
 
-                ['north', 'south'].forEach(side => {
-                    const rows = monthData[side].filter(item => item && item.dayNum === dayNum);
+                ['north', 'south', 'stationary'].forEach(side => {
+                    const rows = (monthData[side] || []).filter(item => item && item.dayNum === dayNum);
                     rows.forEach(item => {
                         const vals = item.values || [];
                         const notes = vals[9] || '';
                         if (notes.includes('בוטל') || notes.includes('התבטל')) return;
 
                         const guides = [vals[1], vals[10]].filter(g => g && g.trim() !== "");
-                        const gorillas = [vals[7], vals[11]].filter(go => go && go.trim() !== "");
+                        const gorillas = (side !== 'stationary') ? [vals[7], vals[11]].filter(go => go && go.trim() !== "") : [];
 
                         guides.forEach(g => {
                             let key = `${dayNum}_${g.trim()}`;
@@ -2184,7 +2324,8 @@
         function renderCurrentWeekTables() {
             const northBody = document.getElementById('northTableBody');
             const southBody = document.getElementById('southTableBody');
-            if (!northBody || !southBody) return;
+            const stationaryBody = document.getElementById('stationaryTableBody');
+            if (!northBody || !southBody || !stationaryBody) return;
             if (monthWeeksCache.length === 0 || !monthWeeksCache[activeWeekIndex]) return;
 
             const activeEl = document.activeElement;
@@ -2194,9 +2335,9 @@
 
             northBody.innerHTML = '';
             southBody.innerHTML = '';
+            stationaryBody.innerHTML = '';
 
             const currentWeekObj = monthWeeksCache[activeWeekIndex];
-
             updateActionButtonsText();
             const today = new Date();
 
@@ -2204,54 +2345,33 @@
                 const monthData = getMonthDataCache(dayInfo.month);
                 const isToday = (currentYear === today.getFullYear() && dayInfo.month === today.getMonth() && dayInfo.day === today.getDate());
 
-                let northRowsWithIndex = [];
-                monthData.north.forEach((item, idx) => {
-                    if (item && item.dayNum === dayInfo.day) northRowsWithIndex.push({ item, idx });
-                });
+                ['north', 'south', 'stationary'].forEach(side => {
+                    if (!monthData[side]) monthData[side] = [];
+                    let rowsWithIndex = [];
+                    monthData[side].forEach((item, idx) => {
+                        if (item && item.dayNum === dayInfo.day) rowsWithIndex.push({ item, idx });
+                    });
 
-                let southRowsWithIndex = [];
-                monthData.south.forEach((item, idx) => {
-                    if (item && item.dayNum === dayInfo.day) southRowsWithIndex.push({ item, idx });
-                });
+                    if (rowsWithIndex.length === 0) {
+                        const defGuide = side === 'north' ? "איתי הקר" : (side === 'south' ? "עדיאל קסה" : "");
+                        const defObj = { id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", defGuide, "", "", "", "", "", "", "", "", "", "", ""] };
+                        monthData[side].push(defObj);
+                        monthData[side].sort((a, b) => a.dayNum - b.dayNum);
+                        rowsWithIndex.push({ item: defObj, idx: monthData[side].indexOf(defObj) });
+                    }
 
-                if (northRowsWithIndex.length === 0) {
-                    const defObj = { id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "איתי הקר", "", "", "", "", "", "", "", "", "", "", ""] };
-                    monthData.north.push(defObj);
-                    monthData.north.sort((a, b) => a.dayNum - b.dayNum);
-                    const newIdx = monthData.north.indexOf(defObj);
-                    northRowsWithIndex.push({ item: defObj, idx: newIdx });
-                }
+                    const targetBody = side === 'north' ? northBody : (side === 'south' ? southBody : stationaryBody);
+                    rowsWithIndex.forEach((rowObj, index) => {
+                        const tr = document.createElement('tr');
+                        const notes = rowObj.item.values[9] || '';
+                        const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
 
-                if (southRowsWithIndex.length === 0) {
-                    const defObj = { id: 'row_' + Math.random().toString(36).substr(2, 9), dayNum: dayInfo.day, hDayName: dayInfo.hDayName, isWeekend: false, values: ["", "עדיאל קסה", "", "", "", "", "", "", "", "", "", "", ""] };
-                    monthData.south.push(defObj);
-                    monthData.south.sort((a, b) => a.dayNum - b.dayNum);
-                    const newIdx = monthData.south.indexOf(defObj);
-                    southRowsWithIndex.push({ item: defObj, idx: newIdx });
-                }
+                        if (isToday) tr.className = 'today-row';
+                        else if (isCanceled) tr.className = 'canceled-row';
 
-                northRowsWithIndex.forEach((rowObj, index) => {
-                    const trNorth = document.createElement('tr');
-                    const notes = rowObj.item.values[9] || '';
-                    const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
-
-                    if (isToday) trNorth.className = 'today-row';
-                    else if (isCanceled) trNorth.className = 'canceled-row';
-
-                    trNorth.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, rowObj.item.values, 'north', dayInfo.month, rowObj.item.id, index > 0);
-                    northBody.appendChild(trNorth);
-                });
-
-                southRowsWithIndex.forEach((rowObj, index) => {
-                    const trSouth = document.createElement('tr');
-                    const notes = rowObj.item.values[9] || '';
-                    const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
-
-                    if (isToday) trSouth.className = 'today-row';
-                    else if (isCanceled) trSouth.className = 'canceled-row';
-
-                    trSouth.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, rowObj.item.values, 'south', dayInfo.month, rowObj.item.id, index > 0);
-                    southBody.appendChild(trSouth);
+                        tr.innerHTML = buildRowHTML(dayInfo.day, dayInfo.hDayName, rowObj.item.values, side, dayInfo.month, rowObj.item.id, index > 0);
+                        targetBody.appendChild(tr);
+                    });
                 });
             });
 
@@ -2274,7 +2394,6 @@
             checkScheduleConflicts();
         }
 
-        // ================= ניהול משימות To-Do והתראות דפדפן =================
         function initCloudTodoSync() {
             const todoRef = window.fbRef(window.fbDB, 'todos');
             window.fbOnValue(todoRef, (snapshot) => {
@@ -2786,6 +2905,7 @@
             let gorillaTrainingDays = [0, 0, 0, 0, 0, 0, 0];
 
             const processRows = (rows) => {
+                if (!rows) return;
                 rows.forEach(item => {
                     if (!item) return;
                     const vals = item.values || [];
@@ -2833,6 +2953,7 @@
 
             processRows(monthData.north);
             processRows(monthData.south);
+            processRows(monthData.stationary);
 
             const kpiDays = document.getElementById('kpiMonthTrainingDays');
             const kpiCanceled = document.getElementById('kpiMonthCanceledDays');
@@ -2986,13 +3107,9 @@
                 values: newValues
             };
 
-            if (side === 'north') {
-                monthData.north.push(newRow);
-                monthData.north.sort((a, b) => a.dayNum - b.dayNum);
-            } else {
-                monthData.south.push(newRow);
-                monthData.south.sort((a, b) => a.dayNum - b.dayNum);
-            }
+            if (!monthData[side]) monthData[side] = [];
+            monthData[side].push(newRow);
+            monthData[side].sort((a, b) => a.dayNum - b.dayNum);
 
             saveSideArrayToCloud(side, targetMonthIdx);
             renderCurrentWeekTables();
@@ -3120,9 +3237,9 @@
 
                 if (fieldIndex === 1) {
                     if (side === 'north') row.hasUserModifiedGuide1 = true;
-                    else row.hasUserModifiedGuide2 = true;
+                    else if (side === 'south') row.hasUserModifiedGuide2 = true;
 
-                    if (window.trainerGorillaMap[val]) {
+                    if (side !== 'stationary' && window.trainerGorillaMap[val]) {
                         const defaults = window.trainerGorillaMap[val];
                         if (defaults[0]) row.values[7] = defaults[0];
                         if (defaults[1]) {
@@ -3168,14 +3285,9 @@
             const hasGuide2 = guide2Val.trim() !== '' || (rowData && rowData.showSecondGuide);
 
             let localGuides1 = [...guidesOptions];
-            if (guide1Val && !localGuides1.includes(guide1Val)) {
-                localGuides1.splice(localGuides1.length - 1, 0, guide1Val);
-            }
-
+            if (guide1Val && !localGuides1.includes(guide1Val)) localGuides1.splice(localGuides1.length - 1, 0, guide1Val);
             let localGuides2 = [...guidesOptions];
-            if (guide2Val && !localGuides2.includes(guide2Val)) {
-                localGuides2.splice(localGuides2.length - 1, 0, guide2Val);
-            }
+            if (guide2Val && !localGuides2.includes(guide2Val)) localGuides2.splice(localGuides2.length - 1, 0, guide2Val);
 
             let guideCellHTML = `
                 <td>
@@ -3198,31 +3310,34 @@
                 </td>
             `;
 
-            const gorilla1Val = vals[7] || '';
-            const gorilla2Val = vals[11] || '';
-            const hasGorilla1 = gorilla1Val.trim() !== '';
-            const hasGorilla2 = gorilla2Val.trim() !== '' || (rowData && rowData.showSecondGorilla);
+            let gorillaCellHTML = '';
+            if (side !== 'stationary') {
+                const gorilla1Val = vals[7] || '';
+                const gorilla2Val = vals[11] || '';
+                const hasGorilla1 = gorilla1Val.trim() !== '';
+                const hasGorilla2 = gorilla2Val.trim() !== '' || (rowData && rowData.showSecondGorilla);
 
-            let gorillaCellHTML = `
-                <td>
-                    <div class="gorillas-container">
-                        <div class="gorilla-row-flex">
-                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_7" class="cell-select ${gorilla1Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 7, this.value); renderCurrentWeekTables();">
-                                ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
-                            </select>
-                            ${hasGorilla1 && !hasGorilla2 ? `<button type="button" class="add-gorilla-btn" onclick="showSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הוסף גורילה נוספת">➕</button>` : ''}
+                gorillaCellHTML = `
+                    <td>
+                        <div class="gorillas-container">
+                            <div class="gorilla-row-flex">
+                                <select id="cell_${side}_${monthIdx}_${cacheIndex}_7" class="cell-select ${gorilla1Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 7, this.value); renderCurrentWeekTables();">
+                                    ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla1Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
+                                </select>
+                                ${hasGorilla1 && !hasGorilla2 ? `<button type="button" class="add-gorilla-btn" onclick="showSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הוסף גורילה נוספת">➕</button>` : ''}
+                            </div>
+                            ${hasGorilla2 ? `
+                            <div class="gorilla-row-flex">
+                                <select id="cell_${side}_${monthIdx}_${cacheIndex}_11" class="cell-select ${gorilla2Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 11, this.value)">
+                                    ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
+                                </select>
+                                <button type="button" class="remove-gorilla-btn" onclick="removeSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הסר גורילה שנייה">❌</button>
+                            </div>
+                            ` : ''}
                         </div>
-                        ${hasGorilla2 ? `
-                        <div class="gorilla-row-flex">
-                            <select id="cell_${side}_${monthIdx}_${cacheIndex}_11" class="cell-select ${gorilla2Val ? 'has-selection' : ''}" onchange="handleSelectChange(this); updateCacheAndSaveById('${side}', ${monthIdx}, '${rowId}', 11, this.value)">
-                                ${gorillaOptions.map(g => `<option value="${escapeHtml(g)}" ${gorilla2Val === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
-                            </select>
-                            <button type="button" class="remove-gorilla-btn" onclick="removeSecondGorillaSelect('${side}', ${monthIdx}, '${rowId}')" title="הסר גורילה שנייה">❌</button>
-                        </div>
-                        ` : ''}
-                    </div>
-                </td>
-            `;
+                    </td>
+                `;
+            }
 
             return `
                 <td>
@@ -3259,7 +3374,7 @@
 
         window.updateCacheAndSave = function(side, monthIdx, cacheIndex, fieldIndex, value) {
             const monthData = getMonthDataCache(monthIdx);
-            const targetRow = side === 'north' ? monthData.north[cacheIndex] : monthData.south[cacheIndex];
+            const targetRow = monthData[side][cacheIndex];
 
             if (targetRow) {
                 if (!Array.isArray(targetRow.values)) targetRow.values = Array(13).fill("");
@@ -3269,7 +3384,7 @@
 
                 if (fieldIndex === 1) {
                     if (side === 'north') targetRow.hasUserModifiedGuide1 = true;
-                    else targetRow.hasUserModifiedGuide2 = true;
+                    else if (side === 'south') targetRow.hasUserModifiedGuide2 = true;
                 }
 
                 const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
@@ -3297,7 +3412,7 @@
             if (cacheIndex !== -1) {
                 updateCacheAndSave(side, monthIdx, cacheIndex, fieldIndex, value);
             }
-        }
+        };
 
         function saveSideArrayToCloud(side, monthIdx) {
             const monthData = getMonthDataCache(monthIdx);
@@ -3491,8 +3606,9 @@
                 const monthData = getMonthDataCache(dayInfo.month);
                 const nRows = monthData.north.filter(item => item && item.dayNum === dayInfo.day);
                 const sRows = monthData.south.filter(item => item && item.dayNum === dayInfo.day);
+                const statRows = (monthData.stationary || []).filter(item => item && item.dayNum === dayInfo.day);
 
-                [...nRows, ...sRows].forEach(item => {
+                [...nRows, ...sRows, ...statRows].forEach(item => {
                     const guide1 = item.values[1] || '';
                     const guide2 = item.values[10] || '';
                     if (trainer.firstName && (guide1.includes(trainer.firstName) || guide2.includes(trainer.firstName))) {
@@ -3528,7 +3644,7 @@
             const dNum = tomorrow.getDate();
             const monthData = getMonthDataCache(mIdx);
             
-            const rows = monthData[side].filter(item => item && item.dayNum === dNum);
+            const rows = (monthData[side] || []).filter(item => item && item.dayNum === dNum);
             if (!rows || rows.length === 0) {
                 showToast("לא נמצאו נתונים למחר.", "error");
                 return;
@@ -3642,6 +3758,8 @@
                     contextText = " צפון ניידת 1 ";
                 } else if (row.closest("#sheetSouthTable")) {
                     contextText = " דרום מרכז ניידת 2 ";
+                } else if (row.closest("#sheetStationaryTable")) {
+                    contextText = " אליקים נייח ";
                 }
 
                 let rowValues = [contextText];
@@ -3698,19 +3816,21 @@
                 const mStr = String(dayInfo.month + 1).padStart(2, '0');
                 let hasDayEntries = false;
                 
-                ['north', 'south'].forEach(side => {
-                    monthData[side].filter(item => item && item.dayNum === dayInfo.day).forEach(item => {
+                ['north', 'south', 'stationary'].forEach(side => {
+                    (monthData[side] || []).filter(item => item && item.dayNum === dayInfo.day).forEach(item => {
                         const vals = item.values;
                         if (vals[1] || vals[2]) {
                             let guideStr = vals[1] || 'לא צויין';
                             if (vals[10]) guideStr += ` + ${vals[10]}`;
 
-                            let gorillaStr = vals[7] || 'לא צויין';
-                            if (vals[11]) gorillaStr += ` + ${vals[11]}`;
+                            let gorillaStr = (side !== 'stationary' && vals[7]) ? vals[7] : '';
+                            if (side !== 'stationary' && vals[11]) gorillaStr += ` + ${vals[11]}`;
 
+                            const sideLabel = side === 'north' ? 'ניידת 1' : (side === 'south' ? 'ניידת 2' : 'אליקים נייח');
+                            let gorillaPart = gorillaStr ? ` | גורילה: ${gorillaStr}` : '';
                             let truckStr = vals[12] ? ` | ניידת: ${vals[12]}` : '';
 
-                            msg += `• *יום ${dayInfo.hDayName} (${dStr}.${mStr})* | ${side === 'north' ? 'ניידת 1' : 'ניידת 2'}: ${vals[2]} (${vals[3]}) | מדריך: ${guideStr} | גורילה: ${gorillaStr}${truckStr}\n`;
+                            msg += `• *יום ${dayInfo.hDayName} (${dStr}.${mStr})* | ${sideLabel}: ${vals[2]} (${vals[3]}) | מדריך: ${guideStr}${gorillaPart}${truckStr}\n`;
                             count++;
                             hasDayEntries = true;
                         }

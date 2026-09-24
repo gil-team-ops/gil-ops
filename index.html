@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
     <title>תפעול והדרכה - צוות גיל</title>
     
-    <!-- PWA Manifest -->
+    <!-- PWA Manifest עם אייקונים מלאים ותקניים -->
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D7%AA%D7%A4%D7%A2%D7%95%D7%9C%20%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94%20-%20%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22short_name%22%3A%22%D7%A6%D7%95%D7%95%D7%AA%20%D7%92%D7%99%D7%9C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%231a252f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjEyOCIgZmlsbD0iIzAyODRjNyIvPjxwZXRoIGQ9Ik0xNTYgMjU2bCA4MCA4MCAxMzItMTMyIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
     <meta name="theme-color" content="#1a252f">
 
-    <!-- Chart.js -->
+    <!-- Chart.js לסרגל נתונים ודשבורד אינטראקטיבי -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Supabase SDK -->
@@ -175,7 +175,7 @@
         });
     </script>
 
-    <!-- PWA Service Worker -->
+    <!-- PWA Service Worker יציב -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -1959,7 +1959,7 @@
         }
 
         function processDashboardMonthDataOnly(monthIdx, saved) {
-            allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, saved, false);
+            allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, saved, true);
         }
 
         function processLoadedMonthData(monthIdx, saved) {
@@ -2069,7 +2069,7 @@
 
         function getMonthDataCache(monthIdx) {
             if (!allMonthsDataCache[monthIdx]) {
-                allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, null, false);
+                allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, null, true);
                 fetchNeighborMonthOnce(monthIdx);
             }
             return allMonthsDataCache[monthIdx];
@@ -3226,6 +3226,7 @@
             handleSelectChange(selectEl);
 
             const monthData = getMonthDataCache(monthIdx);
+            if (!monthData || !monthData[side]) return;
             const cacheIndex = monthData[side].findIndex(r => r && r.id === rowId);
             const row = monthData[side][cacheIndex];
 
@@ -3249,17 +3250,7 @@
                     }
                 }
 
-                const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
-                window.fbSet(window.fbRef(window.fbDB, rowPath), {
-                    id: row.id,
-                    dayNum: row.dayNum,
-                    values: normalizeRowValues(row.values),
-                    hasUserModifiedGuide1: !!row.hasUserModifiedGuide1,
-                    hasUserModifiedGuide2: !!row.hasUserModifiedGuide2
-                }).catch(err => {
-                    console.error(err);
-                    showToast("שגיאה בשמירת השינוי בענן", "error");
-                });
+                saveSideArrayToCloud(side, monthIdx);
 
                 extractMemory(row.values);
                 rebuildDatalists();
@@ -3374,6 +3365,7 @@
 
         window.updateCacheAndSave = function(side, monthIdx, cacheIndex, fieldIndex, value) {
             const monthData = getMonthDataCache(monthIdx);
+            if (!monthData || !monthData[side]) return;
             const targetRow = monthData[side][cacheIndex];
 
             if (targetRow) {
@@ -3387,17 +3379,7 @@
                     else if (side === 'south') targetRow.hasUserModifiedGuide2 = true;
                 }
 
-                const rowPath = `sheets/${currentYear}_${monthIdx}/${side}/${cacheIndex}`;
-                window.fbSet(window.fbRef(window.fbDB, rowPath), {
-                    id: targetRow.id,
-                    dayNum: targetRow.dayNum,
-                    values: normalizeRowValues(targetRow.values),
-                    hasUserModifiedGuide1: !!targetRow.hasUserModifiedGuide1,
-                    hasUserModifiedGuide2: !!targetRow.hasUserModifiedGuide2
-                }).catch(err => {
-                    console.error(err);
-                    showToast("שגיאה בשמירת השינוי בענן", "error");
-                });
+                saveSideArrayToCloud(side, monthIdx);
 
                 extractMemory(targetRow.values);
                 rebuildDatalists();

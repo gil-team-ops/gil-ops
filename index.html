@@ -1522,6 +1522,47 @@
                         </table>
                     </div>
 
+                    <!-- טבלה חדשה: מאפייני וסוגי עננים -->
+                    <h4 style="margin: 16px 0 6px 0; font-size: 0.95em; color: var(--link-color);">🌤️ מאפייני וסוגי עננים (הגדרות מטאורולוגיות)</h4>
+                    <div class="table-container" style="margin-bottom: 15px;">
+                        <table style="width: 100%; text-align: center; border-collapse: collapse; font-size: 0.82em;">
+                            <thead>
+                                <tr style="background-color: var(--th-bg); color: white;">
+                                    <th style="padding: 8px; width: 25%;">סוג ענן</th>
+                                    <th style="padding: 8px; width: 20%;">גובה ומבנה</th>
+                                    <th style="padding: 8px;">תיאור, מאפיינים והשפעה</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 8px; font-weight: bold;">צירוס (Cirrus)<br><span style="font-size:0.85em; color:#64748b;">ענני נוצה</span></td>
+                                    <td style="padding: 8px;">גבוהים ועדינים</td>
+                                    <td style="padding: 8px;">בעלי מראה סיבי או דמוי נוצה, המורכבים מגבישי קרח.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; font-weight: bold;">קומולוס (Cumulus)<br><span style="font-size:0.85em; color:#64748b;">ענני ערמה</span></td>
+                                    <td style="padding: 8px;">צמריריים / בסיס שטוח</td>
+                                    <td style="padding: 8px;">בעלי בסיס שטוח וקצוות מוגדרים. <strong>דחוס:</strong> צפופים המצביעים על התפתחות אנכית משמעותית. <strong>בינוני:</strong> בגודל בינוני המתפתחים ביום נאה.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; font-weight: bold;">קומולונימבוס (Cumulonimbus)<br><span style="font-size:0.85em; color:#64748b;">ענני סערה</span></td>
+                                    <td style="padding: 8px; color: #ef4444; font-weight: bold;">התפתחות לגובה רב</td>
+                                    <td style="padding: 8px;">ענקיים וכהים. מביאים עימם גשמים חזקים, רעמים, ברקים ולעיתים ברד.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; font-weight: bold;">סטרטוקומולוס (Stratocumulus)</td>
+                                    <td style="padding: 8px;">נמוכים / שכבות וגלים</td>
+                                    <td style="padding: 8px;">מופיעים בשכבות או גלים בגווני אפור-לבן. בדרך כלל ללא גשם משמעותי.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; font-weight: bold;">סטרטוס (Stratus)<br><span style="font-size:0.85em; color:#64748b;">ענני שכבה</span></td>
+                                    <td style="padding: 8px;">נמוכים ואפורים</td>
+                                    <td style="padding: 8px;">מכסים את השמיים באופן אחיד (בדומה לערפל מורם). עשויים להביא טפטוף קל.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                     <h4 style="margin: 16px 0 6px 0; font-size: 0.95em; color: var(--link-color);">📊 טבלת גובה מעוף הטיל ביחס למרחק</h4>
                     
                     <p style="font-size: 0.82em; font-weight: bold; margin: 8px 0 4px 0;">טבלת גובה מעוף הטיל ביחס למרחק גיל 1:</p>
@@ -3586,16 +3627,37 @@
             let trainerShifts = [];
             targetWeekObj.days.forEach(dayInfo => {
                 const monthData = getMonthDataCache(dayInfo.month);
-                const nRows = monthData.north.filter(item => item && item.dayNum === dayInfo.day);
-                const sRows = monthData.south.filter(item => item && item.dayNum === dayInfo.day);
-                const statRows = (monthData.stationary || []).filter(item => item && item.dayNum === dayInfo.day);
 
-                [...nRows, ...sRows, ...statRows].forEach(item => {
-                    const guide1 = item.values[1] || '';
-                    const guide2 = item.values[10] || '';
-                    if (trainer.firstName && (guide1.includes(trainer.firstName) || guide2.includes(trainer.firstName))) {
-                        trainerShifts.push({ date: dayInfo.day, month: dayInfo.month + 1, unit: item.values[2], loc: item.values[3], sys: item.values[4], hours: item.values[8] });
-                    }
+                const sides = [
+                    { key: 'north', label: 'ניידת 1 צפון' },
+                    { key: 'south', label: 'ניידת 2 מרכז/דרום' },
+                    { key: 'stationary', label: 'אליקים נייח' }
+                ];
+
+                sides.forEach(({ key, label }) => {
+                    const rows = (monthData[key] || []).filter(item => item && item.dayNum === dayInfo.day);
+                    rows.forEach(item => {
+                        const vals = item.values || [];
+                        const notes = vals[9] || '';
+                        const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
+
+                        const guide1 = vals[1] || '';
+                        const guide2 = vals[10] || '';
+
+                        if (trainer.firstName && (guide1.includes(trainer.firstName) || guide2.includes(trainer.firstName))) {
+                            trainerShifts.push({
+                                day: dayInfo.day,
+                                month: dayInfo.month + 1,
+                                hDayName: dayInfo.hDayName,
+                                site: label,
+                                unit: vals[2] || 'לא צוין',
+                                loc: vals[3] || (key === 'stationary' ? 'אליקים' : 'לא צוין'),
+                                sys: vals[4] || 'ללא',
+                                hours: vals[8] || 'לפי תיאום',
+                                isCanceled: isCanceled
+                            });
+                        }
+                    });
                 });
             });
 
@@ -3606,7 +3668,9 @@
 
             let shiftsText = `שלום ${trainer.firstName},\nלהלן פירוט המשמרות שלך לשבוע ${targetWeekObj.weekNum}:\n\n`;
             trainerShifts.forEach(s => {
-                shiftsText += `• תאריך: ${s.date}/${s.month} | יחידה: ${s.unit} | מיקום: ${s.loc} | מערכת: ${s.sys} | שעות: ${s.hours || 'לפי תיאום'}\n`;
+                const statusTag = s.isCanceled ? ' ❌ [בוטל]' : '';
+                shiftsText += `• *יום ${s.hDayName} (${s.day}/${s.month})* | ${s.site}${statusTag}\n`;
+                shiftsText += `  כוח מתאמן: ${s.unit} | מיקום: ${s.loc} | מערכת: ${s.sys} | שעות: ${s.hours}\n\n`;
             });
 
             let cleanPhone = trainer.phone ? trainer.phone.replace(/\D/g, '') : '';
@@ -3797,22 +3861,42 @@
                 const dStr = String(dayInfo.day).padStart(2, '0');
                 const mStr = String(dayInfo.month + 1).padStart(2, '0');
                 let hasDayEntries = false;
-                
-                ['north', 'south', 'stationary'].forEach(side => {
-                    (monthData[side] || []).filter(item => item && item.dayNum === dayInfo.day).forEach(item => {
-                        const vals = item.values;
-                        if (vals[1] || vals[2]) {
-                            let guideStr = vals[1] || 'לא צויין';
+                let dayText = `📅 *יום ${dayInfo.hDayName} (${dStr}.${mStr})*\n`;
+
+                const sides = [
+                    { key: 'north', label: 'ניידת 1' },
+                    { key: 'south', label: 'ניידת 2' },
+                    { key: 'stationary', label: 'אליקים נייח' }
+                ];
+
+                sides.forEach(({ key, label }) => {
+                    (monthData[key] || []).filter(item => item && item.dayNum === dayInfo.day).forEach(item => {
+                        const vals = item.values || [];
+                        const notes = vals[9] || '';
+                        const isCanceled = notes.includes('בוטל') || notes.includes('התבטל');
+
+                        if (vals[1] || vals[2] || vals[3]) {
+                            let guideStr = vals[1] || 'לא צוין';
                             if (vals[10]) guideStr += ` + ${vals[10]}`;
 
-                            let gorillaStr = (side !== 'stationary' && vals[7]) ? vals[7] : '';
-                            if (side !== 'stationary' && vals[11]) gorillaStr += ` + ${vals[11]}`;
+                            let unitStr = vals[2] ? vals[2] : 'ללא יחידה';
+                            let locStr = vals[3] ? ` (${vals[3]})` : '';
 
-                            const sideLabel = side === 'north' ? 'ניידת 1' : (side === 'south' ? 'ניידת 2' : 'אליקים נייח');
-                            let gorillaPart = gorillaStr ? ` | גורילה: ${gorillaStr}` : '';
-                            let truckStr = vals[12] ? ` | ניידת: ${vals[12]}` : '';
+                            let extraDetails = [];
 
-                            msg += `• *יום ${dayInfo.hDayName} (${dStr}.${mStr})* | ${sideLabel}: ${vals[2]} (${vals[3]}) | מדריך: ${guideStr}${gorillaPart}${truckStr}\n`;
+                            if (key !== 'stationary') {
+                                let gorillaStr = vals[7] || '';
+                                if (vals[11]) gorillaStr += (gorillaStr ? ` + ${vals[11]}` : vals[11]);
+                                if (gorillaStr) extraDetails.push(`גורילה: ${gorillaStr}`);
+                                if (vals[12]) extraDetails.push(`רכב: ${vals[12]}`);
+                            }
+
+                            if (vals[8]) extraDetails.push(`שעות: ${vals[8]}`);
+
+                            let detailsJoined = extraDetails.length > 0 ? ` | ${extraDetails.join(' | ')}` : '';
+                            let statusTag = isCanceled ? ' ❌ *[בוטל]*' : '';
+
+                            dayText += `• *${label}*: ${unitStr}${locStr} | מדריך: ${guideStr}${detailsJoined}${statusTag}\n`;
                             count++;
                             hasDayEntries = true;
                         }
@@ -3820,11 +3904,14 @@
                 });
 
                 if (hasDayEntries) {
-                    msg += `\n`;
+                    msg += dayText + `\n`;
                 }
             });
 
-            if (count === 0) { showToast(`לא נמצאו נתונים פעילים בשבוע ${currentWeekObj.weekNum}.`, "error"); return; }
+            if (count === 0) { 
+                showToast(`לא נמצאו נתונים פעילים בשבוע ${currentWeekObj.weekNum}.`, "error"); 
+                return; 
+            }
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         };
 

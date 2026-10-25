@@ -71,7 +71,8 @@
                     "netashatzberg_gmail_com": { firstName: "נטע", lastName: "שצברג", phone: "0586140806", email: "netashatzberg@gmail.com" },
                     "nogainbal_gmail_com": { firstName: "נגה", lastName: "", phone: "", email: "nogainbal@gmail.com" },
                     "koren_reznik_gmail_com": { firstName: "קרן", lastName: "רזניק", phone: "", email: "koren.reznik@gmail.com" },
-                    "antonicbc_gmail_com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" }
+                    "antonicbc_gmail_com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" },
+                    "liyahaviv1_gmail_com": { firstName: "ליה", lastName: "חביב", phone: "0537174241", email: "liyahaviv1@gmail.com" }
                 };
 
                 if (!data) {
@@ -85,6 +86,10 @@
                     Object.values(data).forEach(t => {
                         if (t.email) window.knownTrainers[t.email.toLowerCase()] = t;
                     });
+                    const leahEmail = defaultDir["liyahaviv1_gmail_com"].email.toLowerCase();
+                    if (!window.knownTrainers[leahEmail]) {
+                        window.knownTrainers[leahEmail] = defaultDir["liyahaviv1_gmail_com"];
+                    }
                 }
             } catch (err) {
                 console.error("Failed loading trainers directory:", err);
@@ -744,6 +749,7 @@
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('nogainbal@gmail.com')">נגה</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('koren.reznik@gmail.com')">קרן</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('antonicbc@gmail.com')">מרקו</button>
+                    <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('liyahaviv1@gmail.com')">ליה</button>
                 </div>
             </div>
 

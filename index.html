@@ -72,7 +72,8 @@
                     "nogainbal_gmail_com": { firstName: "נגה", lastName: "", phone: "", email: "nogainbal@gmail.com" },
                     "koren_reznik_gmail_com": { firstName: "קרן", lastName: "רזניק", phone: "", email: "koren.reznik@gmail.com" },
                     "antonicbc_gmail_com": { firstName: "מרקו", lastName: "", phone: "", email: "antonicbc@gmail.com" },
-                    "liyahaviv1_gmail_com": { firstName: "ליה", lastName: "חביב", phone: "0537174241", email: "liyahaviv1@gmail.com" }
+                    "liyahaviv1_gmail_com": { firstName: "ליה", lastName: "חביב", phone: "0537174241", email: "liyahaviv1@gmail.com" },
+                    "saviryanay_gmail_com": { firstName: "ינאי", lastName: "", phone: "", email: "saviryanay@gmail.com" }
                 };
 
                 if (!data) {
@@ -89,6 +90,10 @@
                     const leahEmail = defaultDir["liyahaviv1_gmail_com"].email.toLowerCase();
                     if (!window.knownTrainers[leahEmail]) {
                         window.knownTrainers[leahEmail] = defaultDir["liyahaviv1_gmail_com"];
+                    }
+                    const yanaiEmail = defaultDir["saviryanay_gmail_com"].email.toLowerCase();
+                    if (!window.knownTrainers[yanaiEmail]) {
+                        window.knownTrainers[yanaiEmail] = defaultDir["saviryanay_gmail_com"];
                     }
                 }
             } catch (err) {
@@ -750,6 +755,7 @@
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('koren.reznik@gmail.com')">קרן</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('antonicbc@gmail.com')">מרקו</button>
                     <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('liyahaviv1@gmail.com')">ליה</button>
+                    <button type="button" class="trainer-chip-btn" onclick="selectQuickTrainer('saviryanay@gmail.com')">ינאי</button>
                 </div>
             </div>
 

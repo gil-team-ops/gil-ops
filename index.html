@@ -50,10 +50,6 @@
             previousDatabaseConnectionState = connected;
             window.fbIsConnected = connected;
             window.isFirebaseConnected = connected;
-            const headerTitle = document.querySelector('header h1');
-            if (headerTitle) {
-                headerTitle.style.borderBottom = connected ? 'none' : '2px solid #ef4444';
-            }
         }, (error) => {
             console.error("Failed monitoring Firebase connection:", error);
         });
@@ -382,6 +378,18 @@
             display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
             background: #0284c7; color: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             font-weight: 800; font-size: 0.95em; cursor: pointer; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.25);
+        }
+        .header-user-profile { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
+        .firebase-connection-indicator {
+            width: 9px; height: 9px; border-radius: 50%; display: block;
+            border: 1px solid rgba(255,255,255,0.75); background: #94a3b8;
+            box-shadow: 0 0 0 2px rgba(148,163,184,0.2);
+        }
+        .firebase-connection-indicator.is-connected {
+            background: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.25);
+        }
+        .firebase-connection-indicator.is-disconnected {
+            background: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
         }
 
         .header-actions-left { display: flex; gap: 8px; align-items: center; }
@@ -807,8 +815,11 @@
         <header>
             <div class="header-top">
                 <h1>
-                    <div id="userHeaderAvatar" class="header-user-avatar" onclick="editTrainerProfile()" title="לחץ לעריכת פרטי מדריך">
-                        גיל
+                    <div class="header-user-profile">
+                        <div id="userHeaderAvatar" class="header-user-avatar" onclick="editTrainerProfile()" title="לחץ לעריכת פרטי מדריך">
+                            גיל
+                        </div>
+                        <span id="firebaseConnectionIndicator" class="firebase-connection-indicator" role="status" aria-label="בודק חיבור ל-Firebase" title="בודק חיבור ל-Firebase"></span>
                     </div>
                     תפעול והדרכה - צוות גיל
                 </h1>
@@ -2015,6 +2026,7 @@
         }
 
         window.addEventListener('firebase-ready', () => {
+            updateFirebaseConnectionIndicator(window.fbIsConnected);
             if (window.fbIsConnected === false) {
                 showToast("אין כרגע חיבור ל-Firebase; השינויים יישלחו כשהחיבור יחזור", "warning");
             }
@@ -2040,12 +2052,29 @@
         });
 
         window.addEventListener('firebase-connection-changed', (event) => {
+            updateFirebaseConnectionIndicator(event.detail.connected);
             if (event.detail.connected) {
                 showToast("החיבור ל-Firebase חזר", "success");
             } else {
                 showToast("החיבור ל-Firebase נותק; השינויים יסונכרנו כשהחיבור יחזור", "warning");
             }
         });
+
+        function updateFirebaseConnectionIndicator(connected) {
+            const indicator = document.getElementById('firebaseConnectionIndicator');
+            if (!indicator) return;
+
+            const isConnected = connected === true;
+            indicator.classList.toggle('is-connected', isConnected);
+            indicator.classList.toggle('is-disconnected', connected === false);
+            const statusText = connected === null || connected === undefined
+                ? "בודק חיבור ל-Firebase"
+                : isConnected
+                    ? "מחובר ל-Firebase - השינויים יישלחו לענן"
+                    : "החיבור ל-Firebase נותק. מתבצע ניסיון התחברות מחדש; אם הנורה לא חוזרת לירוק, רענן את הדף";
+            indicator.title = statusText;
+            indicator.setAttribute('aria-label', statusText);
+        }
 
         function loadMonthDataFromCloud(monthIdx) {
             if (activeMonthRef && activeMonthCallback) {

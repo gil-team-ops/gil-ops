@@ -19,7 +19,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, get, update, push, remove, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, get, update, push, remove, off, goOnline } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCdqf9bo_mMiMxjXU24zMnrDgX4qTLcHwM",
@@ -35,6 +35,42 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+
+        let previousDatabaseConnectionState = null;
+        window.isFirebaseConnected = null;
+        window.fbGoOnline = goOnline;
+        onValue(ref(db, '.info/connected'), (snapshot) => {
+            const connected = snapshot.val() === true;
+            const initialOfflineState = previousDatabaseConnectionState === null && !connected;
+            if (initialOfflineState || (previousDatabaseConnectionState !== null && previousDatabaseConnectionState !== connected)) {
+                window.dispatchEvent(new CustomEvent('firebase-connection-changed', {
+                    detail: { connected }
+                }));
+            }
+            previousDatabaseConnectionState = connected;
+            window.fbIsConnected = connected;
+            window.isFirebaseConnected = connected;
+            const headerTitle = document.querySelector('header h1');
+            if (headerTitle) {
+                headerTitle.style.borderBottom = connected ? 'none' : '2px solid #ef4444';
+            }
+        }, (error) => {
+            console.error("Failed monitoring Firebase connection:", error);
+        });
+
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState !== 'visible') return;
+
+            try {
+                if (auth.currentUser) {
+                    await auth.currentUser.getIdToken(true);
+                }
+            } catch (error) {
+                console.error("Failed refreshing Firebase auth token:", error);
+            } finally {
+                goOnline(db);
+            }
+        });
 
         window.fbDB = db;
         window.fbRef = ref;
@@ -1866,6 +1902,22 @@
         let lastConflictsSignature = "";
         let isInitialWeekLoad = true;
         let monthFetchInFlight = {};
+        const cloudWriteQueues = new Map();
+
+        function enqueueCloudWrite(path, write) {
+            const previousWrite = cloudWriteQueues.get(path) || Promise.resolve();
+            const currentWrite = previousWrite.catch(() => {}).then(write);
+            cloudWriteQueues.set(path, currentWrite);
+            currentWrite.then(
+                () => {
+                    if (cloudWriteQueues.get(path) === currentWrite) cloudWriteQueues.delete(path);
+                },
+                () => {
+                    if (cloudWriteQueues.get(path) === currentWrite) cloudWriteQueues.delete(path);
+                }
+            );
+            return currentWrite;
+        }
 
         const guidesOptions = ["", "איתי הקר", "עדיאל קסה", "תומר כחלון", "עידו לבקוביץ", "נדב יחיא", "נטע שצברג", "נגה", "קרן", "ראם קייזר", "מרקו", "טיפול חודשי", "אחר..."];
         const gorillaOptions = ["", "גורילה 1", "גורילה 2", "גורילה 3", "גורילה 4", "גורילה 5", "גורילה 6", "גורילה 7"];
@@ -1963,6 +2015,10 @@
         }
 
         window.addEventListener('firebase-ready', () => {
+            if (window.fbIsConnected === false) {
+                showToast("אין כרגע חיבור ל-Firebase; השינויים יישלחו כשהחיבור יחזור", "warning");
+            }
+
             const savedTab = localStorage.getItem('gorilla_active_tab') || 'schedule';
             const btn = document.querySelector(`.tab-btn[onclick*="${savedTab}"]`);
             if (btn) switchTab(savedTab, { currentTarget: btn }, false);
@@ -1981,6 +2037,14 @@
             loadDashboardMonthDataFromCloud(activeDashboardMonth);
             initCloudStatusSync();
             initCloudTodoSync();
+        });
+
+        window.addEventListener('firebase-connection-changed', (event) => {
+            if (event.detail.connected) {
+                showToast("החיבור ל-Firebase חזר", "success");
+            } else {
+                showToast("החיבור ל-Firebase נותק; השינויים יסונכרנו כשהחיבור יחזור", "warning");
+            }
         });
 
         function loadMonthDataFromCloud(monthIdx) {
@@ -3459,15 +3523,17 @@
                 hasUserModifiedGuide2: !!item.hasUserModifiedGuide2
             }));
 
-            const sideRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}/${side}`);
-            try {
-                window.fbSet(sideRef, cleanArray).catch(err => {
-                    console.error(err);
+            const path = `sheets/${currentYear}_${monthIdx}/${side}`;
+            enqueueCloudWrite(path, () => {
+                if (window.fbIsConnected === false && window.fbGoOnline) {
+                    window.fbGoOnline(window.fbDB);
+                }
+                return window.fbSet(window.fbRef(window.fbDB, path), cleanArray);
+            })
+                .catch(err => {
+                    console.error("Failed to save schedule to Firebase:", err);
                     showToast("שגיאה בשמירת הגיליון לענן", "error");
                 });
-            } catch (err) {
-                console.error("Failed to save (validation error):", err);
-            }
         }
 
         function initCloudStatusSync() {
@@ -3516,6 +3582,21 @@
             });
         }
 
+        const debouncedSaveStatusesToCloud = debounce((statusesData) => {
+            enqueueCloudWrite('gorilla_statuses', () => {
+                if (window.fbIsConnected === false && window.fbGoOnline) {
+                    window.fbGoOnline(window.fbDB);
+                }
+                return window.fbSet(
+                    window.fbRef(window.fbDB, 'gorilla_statuses'),
+                    statusesData
+                );
+            }).catch(err => {
+                console.error("Failed to save statuses to Firebase:", err);
+                showToast("שגיאה בשמירת סטטוס גורילות", "error");
+            });
+        }, 250);
+
         window.saveStatusData = function() {
             const rows = document.querySelectorAll('#statusTableBody tr');
             let statusesData = {};
@@ -3530,11 +3611,7 @@
                 };
             });
             latestStatusData = statusesData;
-            const statusRef = window.fbRef(window.fbDB, 'gorilla_statuses');
-            window.fbSet(statusRef, statusesData).catch(err => {
-                console.error(err);
-                showToast("שגיאה בשמירת סטטוס גורילות", "error");
-            });
+            debouncedSaveStatusesToCloud(statusesData);
             renderDashboard(activeDashboardMonth);
         };
 

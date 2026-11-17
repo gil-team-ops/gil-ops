@@ -321,6 +321,23 @@
         .toast-msg.warning { background: #fef9c3; color: #854d0e; border-color: #facc15; }
         @keyframes slideInUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+        .connection-warning-overlay {
+            position: fixed; inset: 0; z-index: 1000000; display: flex;
+            align-items: center; justify-content: center; padding: 20px;
+            background: rgba(15, 23, 42, 0.65);
+        }
+        .connection-warning-overlay[hidden] { display: none; }
+        .connection-warning {
+            width: 100%; max-width: 420px; padding: 24px; text-align: center;
+            background: var(--main-bg); color: var(--text-color); border: 1px solid #f87171;
+            border-radius: 12px; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+        }
+        .connection-warning p { margin: 0 0 18px; font-size: 1.1em; font-weight: 700; }
+        .connection-warning button {
+            padding: 9px 18px; color: white; background: #dc2626; border: 0;
+            border-radius: 8px; font-weight: 700; cursor: pointer;
+        }
+
         #auth-screen {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100vh; background-color: #0f172a; color: #ffffff; position: fixed;
@@ -768,6 +785,12 @@
 <body>
 
     <div id="toastContainer"></div>
+    <div id="connectionWarningOverlay" class="connection-warning-overlay" hidden>
+        <section class="connection-warning" role="alertdialog" aria-modal="true" aria-labelledby="connectionWarningText">
+            <p id="connectionWarningText">נא לרענן את האתר על מנת לעדכן שינויים</p>
+            <button type="button" onclick="dismissConnectionWarning()">הבנתי</button>
+        </section>
+    </div>
 
     <!-- מסך התחברות מהיר וידידותי -->
     <div id="auth-screen">
@@ -2028,7 +2051,7 @@
         window.addEventListener('firebase-ready', () => {
             updateFirebaseConnectionIndicator(window.fbIsConnected);
             if (window.fbIsConnected === false) {
-                showToast("אין כרגע חיבור ל-Firebase; השינויים יישלחו כשהחיבור יחזור", "warning");
+                showConnectionWarning();
             }
 
             const savedTab = localStorage.getItem('gorilla_active_tab') || 'schedule';
@@ -2054,11 +2077,30 @@
         window.addEventListener('firebase-connection-changed', (event) => {
             updateFirebaseConnectionIndicator(event.detail.connected);
             if (event.detail.connected) {
+                hideConnectionWarning();
                 showToast("החיבור ל-Firebase חזר", "success");
             } else {
-                showToast("החיבור ל-Firebase נותק; השינויים יסונכרנו כשהחיבור יחזור", "warning");
+                if (document.getElementById('main-content').style.display !== 'none') {
+                    showConnectionWarning();
+                }
             }
         });
+
+        function showConnectionWarning() {
+            const overlay = document.getElementById('connectionWarningOverlay');
+            if (!overlay) return;
+            overlay.hidden = false;
+            overlay.querySelector('button').focus();
+        }
+
+        function hideConnectionWarning() {
+            const overlay = document.getElementById('connectionWarningOverlay');
+            if (overlay) overlay.hidden = true;
+        }
+
+        window.dismissConnectionWarning = function() {
+            hideConnectionWarning();
+        };
 
         function updateFirebaseConnectionIndicator(connected) {
             const indicator = document.getElementById('firebaseConnectionIndicator');

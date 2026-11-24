@@ -695,6 +695,8 @@
             display: flex; gap: 6px; overflow-x: auto; padding: 14px 6px; margin-top: 20px;
             border-top: 2px solid var(--border-color); background: var(--card-bg); border-radius: 8px; justify-content: center; flex-wrap: wrap; align-items: flex-end;
         }
+        .month-year-group { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; width: 100%; }
+        .month-year-label { color: var(--text-color); font-weight: 800; padding: 0 8px; }
         .month-folder-btn { background-color: #475569; color: white; border: none; padding: 9px 16px; border-radius: 6px 6px 0 0; cursor: pointer; font-weight: bold; font-size: 0.9em; }
         .month-folder-btn:hover { background-color: #64748b; transform: translateY(-4px); }
         .month-folder-btn.active {
@@ -1936,7 +1938,9 @@
         const hebrewDaysShort = ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"];
         const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
         
-        const currentYear = new Date().getFullYear();
+        const firstAvailableYear = new Date().getFullYear();
+        const availableYears = [firstAvailableYear, firstAvailableYear + 1];
+        let currentYear = firstAvailableYear;
         let activeMonth = new Date().getMonth(); 
         let activeDashboardMonth = new Date().getMonth(); 
         let activeWeekIndex = 0; 
@@ -2013,19 +2017,45 @@
             return `${year}-${month}-${day}`;
         }
 
-        function getAirForceWeek(date) {
+        function getFirstSundayOfJanuary(year) {
+            const januaryFirst = new Date(year, 0, 1);
+            return new Date(year, 0, 1 + ((7 - januaryFirst.getDay()) % 7));
+        }
+
+        function getWeekStart(date) {
             const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const targetYear = d.getMonth() >= 6 ? d.getFullYear() : d.getFullYear() - 1;
-            const julyFirst = new Date(targetYear, 6, 1);
-            let firstSunday = new Date(targetYear, 6, 1 - julyFirst.getDay());
-            if (d < firstSunday) {
-                const prevJulyFirst = new Date(targetYear - 1, 6, 1);
-                firstSunday = new Date(targetYear - 1, 6, 1 - prevJulyFirst.getDay());
+            const firstSunday = getFirstSundayOfJanuary(d.getFullYear());
+            const diffDays = Math.round((d - firstSunday) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) return null;
+            return new Date(firstSunday.getFullYear(), firstSunday.getMonth(), firstSunday.getDate() + Math.floor(diffDays / 7) * 7);
+        }
+
+        function getAirForceWeek(date) {
+            if (date.getFullYear() === 2026) {
+                const specialStarts = [
+                    { week: 45, date: new Date(2026, 10, 1) },
+                    { week: 46, date: new Date(2026, 10, 8) },
+                    { week: 47, date: new Date(2026, 10, 15) },
+                    { week: 48, date: new Date(2026, 10, 22) },
+                    { week: 49, date: new Date(2026, 10, 29) },
+                    { week: 50, date: new Date(2026, 11, 6) },
+                    { week: 51, date: new Date(2026, 11, 13) },
+                    { week: 52, date: new Date(2026, 11, 20) },
+                    { week: 53, date: new Date(2026, 11, 27) }
+                ];
+
+                for (let i = specialStarts.length - 1; i >= 0; i--) {
+                    if (date >= specialStarts[i].date) return specialStarts[i].week;
+                }
             }
-            const diffTime = d - firstSunday;
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            const weekOffset = Math.floor(diffDays / 7);
-            return 27 + weekOffset;
+
+            const weekStart = getWeekStart(date);
+            if (!weekStart) return 0;
+            const firstSunday = getFirstSundayOfJanuary(date.getFullYear());
+            const diffDays = Math.round((weekStart - firstSunday) / (1000 * 60 * 60 * 24));
+            const normalWeek = Math.floor(diffDays / 7) + 1;
+            const novemberAdjustmentStart = new Date(date.getFullYear(), 10, 22);
+            return weekStart >= novemberAdjustmentStart ? normalWeek + 1 : normalWeek;
         }
 
         let monthWeeksCache = [];
@@ -2137,8 +2167,10 @@
             if (activeMonthRef && activeMonthCallback) {
                 window.fbOff(activeMonthRef, 'value', activeMonthCallback);
             }
-            activeMonthRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            const year = currentYear;
+            activeMonthRef = window.fbRef(window.fbDB, `sheets/${year}_${monthIdx}`);
             activeMonthCallback = (snapshot) => {
+                if (year !== currentYear) return;
                 const saved = snapshot.val();
                 processLoadedMonthData(monthIdx, saved);
                 renderCurrentWeekTables();
@@ -2152,8 +2184,10 @@
             if (activeDashboardRef && activeDashboardCallback) {
                 window.fbOff(activeDashboardRef, 'value', activeDashboardCallback);
             }
-            activeDashboardRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            const year = currentYear;
+            activeDashboardRef = window.fbRef(window.fbDB, `sheets/${year}_${monthIdx}`);
             activeDashboardCallback = (snapshot) => {
+                if (year !== currentYear) return;
                 const saved = snapshot.val();
                 processDashboardMonthDataOnly(monthIdx, saved);
                 renderDashboard(activeDashboardMonth);
@@ -2262,8 +2296,10 @@
         function fetchNeighborMonthOnce(monthIdx) {
             if (monthFetchInFlight[monthIdx]) return;
             monthFetchInFlight[monthIdx] = true;
-            const monthRef = window.fbRef(window.fbDB, `sheets/${currentYear}_${monthIdx}`);
+            const year = currentYear;
+            const monthRef = window.fbRef(window.fbDB, `sheets/${year}_${monthIdx}`);
             window.fbGet(monthRef).then(snapshot => {
+                if (year !== currentYear) return;
                 allMonthsDataCache[monthIdx] = buildMonthDataFromSaved(monthIdx, snapshot.val(), true);
                 renderCurrentWeekTables();
                 renderDashboard(activeDashboardMonth);
@@ -2278,6 +2314,84 @@
             return allMonthsDataCache[monthIdx];
         }
 
+        function getCalendarWeeksForMonth(year, monthIdx) {
+            if (year === 2026) {
+                const specialWeeks = [
+                    { weekNum: 45, startDate: new Date(2026, 10, 1), endDate: new Date(2026, 10, 5) },
+                    { weekNum: 46, startDate: new Date(2026, 10, 8), endDate: new Date(2026, 10, 12) },
+                    { weekNum: 47, startDate: new Date(2026, 10, 15), endDate: new Date(2026, 10, 19) },
+                    { weekNum: 48, startDate: new Date(2026, 10, 22), endDate: new Date(2026, 10, 26) },
+                    { weekNum: 49, startDate: new Date(2026, 10, 29), endDate: new Date(2026, 11, 3) },
+                    { weekNum: 50, startDate: new Date(2026, 11, 6), endDate: new Date(2026, 11, 10) },
+                    { weekNum: 51, startDate: new Date(2026, 11, 13), endDate: new Date(2026, 11, 17) },
+                    { weekNum: 52, startDate: new Date(2026, 11, 20), endDate: new Date(2026, 11, 24) },
+                    { weekNum: 53, startDate: new Date(2026, 11, 27), endDate: new Date(2026, 11, 31) }
+                ];
+
+                const monthStart = new Date(year, monthIdx, 1);
+                const monthEnd = new Date(year, monthIdx + 1, 0);
+                const result = [];
+
+                specialWeeks.forEach(week => {
+                    if (week.startDate > monthEnd || week.endDate < monthStart) return;
+
+                    const days = [];
+                    for (let d = new Date(week.startDate); d <= week.endDate; d.setDate(d.getDate() + 1)) {
+                        if (d.getFullYear() === year) {
+                            days.push({
+                                month: d.getMonth(),
+                                day: d.getDate(),
+                                hDayName: hebrewDaysShort[d.getDay()],
+                                isWeekend: false
+                            });
+                        }
+                    }
+
+                    if (days.length > 0) result.push({ ...week, days });
+                });
+
+                if (result.length > 0) return result;
+            }
+
+            const monthStart = new Date(year, monthIdx, 1);
+            const monthEnd = new Date(year, monthIdx + 1, 0);
+            const firstSunday = getFirstSundayOfJanuary(year);
+            const weeksMap = new Map();
+
+            for (let weekStart = new Date(firstSunday);
+                 weekStart <= monthEnd;
+                 weekStart.setDate(weekStart.getDate() + 7)) {
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 4);
+
+                if (weekStart > monthEnd || weekEnd < monthStart) continue;
+
+                const wNum = getAirForceWeek(weekStart);
+                const weekDays = [];
+                for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+                    if (d.getFullYear() === year) {
+                        weekDays.push({
+                            month: d.getMonth(),
+                            day: d.getDate(),
+                            hDayName: hebrewDaysShort[d.getDay()],
+                            isWeekend: false
+                        });
+                    }
+                }
+
+                if (weekDays.length > 0) {
+                    weeksMap.set(wNum, {
+                        weekNum: wNum,
+                        days: weekDays,
+                        startDate: new Date(weekStart),
+                        endDate: new Date(weekEnd)
+                    });
+                }
+            }
+
+            return Array.from(weeksMap.values());
+        }
+
         function setupWeeksCache(monthIdx) {
             const mData = getMonthDataCache(monthIdx);
             if (mData) {
@@ -2286,43 +2400,8 @@
                 if (mData.stationary) mData.stationary.forEach(item => extractMemory(item.values));
             }
 
-            const daysInMonth = new Date(currentYear, monthIdx + 1, 0).getDate();
-            const weeksMap = new Map();
-
-            for (let dayNum = 1; dayNum <= daysInMonth; dayNum++) {
-                const date = new Date(currentYear, monthIdx, dayNum);
-                if (date.getDay() === 5 || date.getDay() === 6) continue;
-
-                const wNum = getAirForceWeek(date);
-                const dayOfWeek = date.getDay();
-                const sunDate = new Date(date);
-                sunDate.setDate(date.getDate() - dayOfWeek);
-
-                if (sunDate.getMonth() === monthIdx) {
-                    if (!weeksMap.has(wNum)) {
-                        const satDate = new Date(sunDate);
-                        satDate.setDate(satDate.getDate() + 6);
-
-                        let weekDays = [];
-                        for (let d = new Date(sunDate); d <= satDate; d.setDate(d.getDate() + 1)) {
-                            if (d.getFullYear() === currentYear && d.getDay() !== 5 && d.getDay() !== 6) {
-                                weekDays.push({
-                                    month: d.getMonth(),
-                                    day: d.getDate(),
-                                    hDayName: hebrewDaysShort[d.getDay()],
-                                    isWeekend: false
-                                });
-                            }
-                        }
-                        if (weekDays.length > 0) {
-                            weeksMap.set(wNum, { weekNum: wNum, days: weekDays });
-                        }
-                    }
-                }
-            }
-
             monthWeeksCache = [];
-            weeksMap.forEach((wObj) => monthWeeksCache.push(wObj));
+            monthWeeksCache = getCalendarWeeksForMonth(currentYear, monthIdx);
 
             const today = new Date();
             let foundTodayIndex = -1;
@@ -2382,43 +2461,65 @@
             `;
         }
 
-        function initMonthFolders() {
-            const bar = document.getElementById('monthFoldersBar');
+        function renderMonthYearGroups(barId, activeMonthIndex, view) {
+            const bar = document.getElementById(barId);
             if (!bar) return;
             bar.innerHTML = '';
-            monthNames.forEach((mName, idx) => {
-                const btn = document.createElement('button');
-                btn.className = `month-folder-btn ${idx === activeMonth ? 'active' : ''}`;
-                btn.innerText = mName;
-                btn.onclick = () => {
-                    document.querySelectorAll('#monthFoldersBar .month-folder-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    activeMonth = idx;
-                    activeWeekIndex = 0;
-                    activeWeekNum = null;
-                    isInitialWeekLoad = true;
-                    loadMonthData(activeMonth);
-                };
-                bar.appendChild(btn);
+
+            availableYears.forEach(year => {
+                const group = document.createElement('div');
+                group.className = 'month-year-group';
+                const yearLabel = document.createElement('span');
+                yearLabel.className = 'month-year-label';
+                yearLabel.innerText = year;
+                group.appendChild(yearLabel);
+
+                monthNames.forEach((mName, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `month-folder-btn ${year === currentYear && idx === activeMonthIndex ? 'active' : ''}`;
+                    btn.innerText = mName;
+                    btn.onclick = () => selectScheduleMonth(year, idx, view);
+                    group.appendChild(btn);
+                });
+                bar.appendChild(group);
             });
         }
 
+        function selectScheduleMonth(year, monthIdx, view) {
+            const yearChanged = year !== currentYear;
+            currentYear = year;
+
+            if (view === 'schedule') {
+                activeMonth = monthIdx;
+                activeWeekIndex = 0;
+                activeWeekNum = null;
+                isInitialWeekLoad = true;
+            } else {
+                activeDashboardMonth = monthIdx;
+            }
+
+            if (yearChanged) {
+                allMonthsDataCache = {};
+                monthFetchInFlight = {};
+                monthWeeksCache = [];
+                activeWeekIndex = 0;
+                activeWeekNum = null;
+                isInitialWeekLoad = true;
+            }
+
+            initMonthFolders();
+            initDashboardMonthTabs();
+
+            if (yearChanged || view === 'schedule') loadMonthData(activeMonth);
+            if (yearChanged || view === 'dashboard') loadDashboardMonthDataFromCloud(activeDashboardMonth);
+        }
+
+        function initMonthFolders() {
+            renderMonthYearGroups('monthFoldersBar', activeMonth, 'schedule');
+        }
+
         function initDashboardMonthTabs() {
-            const bar = document.getElementById('dashboardMonthTabs');
-            if (!bar) return;
-            bar.innerHTML = '';
-            monthNames.forEach((mName, idx) => {
-                const btn = document.createElement('button');
-                btn.className = `month-folder-btn ${idx === activeDashboardMonth ? 'active' : ''}`;
-                btn.innerText = mName;
-                btn.onclick = () => {
-                    document.querySelectorAll('#dashboardMonthTabs .month-folder-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    activeDashboardMonth = idx;
-                    loadDashboardMonthDataFromCloud(activeDashboardMonth);
-                };
-                bar.appendChild(btn);
-            });
+            renderMonthYearGroups('dashboardMonthTabs', activeDashboardMonth, 'dashboard');
         }
 
         function initWeekTabs() {
@@ -2434,11 +2535,15 @@
                     isTodayWeek = weekObj.days.some(d => d.month === today.getMonth() && d.day === today.getDate());
                 }
 
-                const startD = weekObj.days[0];
-                const endD = weekObj.days[weekObj.days.length - 1];
+                const startD = weekObj.startDate || weekObj.days[0];
+                const endD = weekObj.endDate || weekObj.days[weekObj.days.length - 1];
+                const startDay = startD.getDate ? startD.getDate() : startD.day;
+                const startMonth = startD.getMonth ? startD.getMonth() + 1 : startD.month + 1;
+                const endDay = endD.getDate ? endD.getDate() : endD.day;
+                const endMonth = endD.getMonth ? endD.getMonth() + 1 : endD.month + 1;
 
                 btn.className = `week-tab-btn ${idx === activeWeekIndex ? 'active' : ''} ${isTodayWeek ? 'today-week-tab' : ''}`;
-                btn.innerText = `שבוע ${weekObj.weekNum} (${startD.day}/${startD.month+1} - ${endD.day}/${endD.month+1})`;
+                btn.innerText = `שבוע ${weekObj.weekNum} (${startDay}/${startMonth} - ${endDay}/${endMonth})`;
                 btn.onclick = () => {
                     document.querySelectorAll('.week-tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
@@ -3042,7 +3147,14 @@
             const titleEl = document.getElementById('statsMonthTitle');
             const chartMonthLabel = document.getElementById('chartMonthLabel');
             if (titleEl) titleEl.innerText = `${monthName} ${currentYear}`;
-            if (chartMonthLabel) chartMonthLabel.innerText = `(חודש ${monthName})`;
+            const monthWeeks = getCalendarWeeksForMonth(currentYear, monthIdx);
+            if (chartMonthLabel) {
+                if (monthWeeks.length > 0) {
+                    chartMonthLabel.innerText = `(חודש ${monthName} • שבועות ${monthWeeks[0].weekNum}-${monthWeeks[monthWeeks.length - 1].weekNum})`;
+                } else {
+                    chartMonthLabel.innerText = `(חודש ${monthName})`;
+                }
+            }
 
             let healthyCount = 0;
             let faultyCount = 0;
